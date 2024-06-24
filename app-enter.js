@@ -26,7 +26,7 @@ class AppEnter extends LitElement {
 
   // @ts-ignore
   render() {
-    return html` <button @click=${this.go("login-container")}>Login</button>
+    return html` <button @click=${() => this.go("login-container")}>Login</button>
       <slot></slot>`;
   }
 }

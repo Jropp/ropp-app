@@ -8,6 +8,7 @@ function setHeaders(overrides = {}, sessionUser = getSessionUser()) {
   const defaultHeaders = {
     "Content-Type": "application/json",
     Accept: "application/json",
+    "Access-Control-Allow-Origin": "*",
   };
 
   if (sessionUser?.accessToken) defaultHeaders.Authorization = `Bearer ${sessionUser.accessToken}`;
@@ -32,5 +33,5 @@ export function appFetch(url, { method = "GET", body, headers = {} }) {
 
   if (body) reqInit.body = JSON.stringify(body);
 
-  return fetch("app.jasonropp.com/api" + url, reqInit);
+  return fetch("https://app.jasonropp.com/api" + url, reqInit);
 }
