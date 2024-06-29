@@ -1,3 +1,5 @@
+// @ts-nocheck
+import { env } from "../env.js";
 import { getSessionUser } from "./session.js";
 
 /**
@@ -11,7 +13,8 @@ function setHeaders(overrides = {}, sessionUser = getSessionUser()) {
     "Access-Control-Allow-Origin": "*",
   };
 
-  if (sessionUser?.accessToken) defaultHeaders.Authorization = `Bearer ${sessionUser.accessToken}`;
+  console.log(sessionUser);
+  if (sessionUser?.token) defaultHeaders.Authorization = `Bearer ${sessionUser.token}`;
 
   return { ...defaultHeaders, ...overrides };
 }
@@ -33,5 +36,7 @@ export function appFetch(url, { method = "GET", body, headers = {} }) {
 
   if (body) reqInit.body = JSON.stringify(body);
 
-  return fetch("https://app.jasonropp.com/api" + url, reqInit);
+  // return fetch("https://app.jasonropp.com/api" + url, reqInit);
+  return fetch(env.API_URL + url, reqInit);
 }
+

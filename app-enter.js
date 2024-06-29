@@ -1,5 +1,6 @@
 import { LitElement, html } from "./lib/lit.js";
 import "./env.js";
+import "./ui/views/login-container.js";
 
 /** @param {string} route */
 const componentLoader = (route) => import(`./ui/views/${route}.js`);
@@ -26,7 +27,9 @@ class AppEnter extends LitElement {
 
   // @ts-ignore
   render() {
-    return html` <button @click=${() => this.go("login-container")}>Login</button>
+    return html` 
+      <button @click=${() => this.go("login-container")}>Login</button>
+      <button @click=${() => this.go("notes-container")}>Notes</button>
       <slot></slot>`;
   }
 }

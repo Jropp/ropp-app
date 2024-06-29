@@ -1,6 +1,7 @@
 import { LitElement, html } from "../../lib/lit.js";
 import { setSessionUser } from "../../services/session.js";
 import { loginUser, signupUser } from "../../services/user.service.js";
+import { styles } from "../styles.js";
 
 class LoginContainer extends LitElement {
   static get properties() {
@@ -24,10 +25,12 @@ class LoginContainer extends LitElement {
     const email = formData.get("email");
     const password = formData.get("password");
 
+    console.log({ email, password });
+
     try {
       const user = await signupUser({ email, password });
       setSessionUser(user);
-      alert("Signup successful!");
+      console.log(user);
     } catch (error) {
       alert("Signup failed: " + error.message);
     }
@@ -36,15 +39,13 @@ class LoginContainer extends LitElement {
   async login(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const username = formData.get("email");
+    const email = formData.get("email");
     const password = formData.get("password");
 
     try {
-      const user = await loginUser({ username, password });
+      const user = await loginUser({ email, password });
       setSessionUser(user);
-      alert("Login successful!");
     } catch (error) {
-      alert("Login failed: " + error.message);
     }
   }
 
@@ -69,6 +70,8 @@ class LoginContainer extends LitElement {
           `}
     `;
   }
+
+  static styles = [styles];
 }
 
 customElements.define("login-container", LoginContainer);
