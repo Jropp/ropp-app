@@ -25,12 +25,10 @@ class LoginContainer extends LitElement {
     const email = formData.get("email");
     const password = formData.get("password");
 
-    console.log({ email, password });
-
     try {
       const user = await signupUser({ email, password });
       setSessionUser(user);
-      console.log(user);
+
     } catch (error) {
       alert("Signup failed: " + error.message);
     }
@@ -45,6 +43,7 @@ class LoginContainer extends LitElement {
     try {
       const user = await loginUser({ email, password });
       setSessionUser(user);
+      window.dispatchEvent(new CustomEvent('go', { detail: { route: 'notes-container' } }));
     } catch (error) {
     }
   }

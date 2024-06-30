@@ -15,8 +15,11 @@ class AppEnter extends LitElement {
     /** @type {User} */
     this.user = null;
   }
+
   connectedCallback() {
     super.connectedCallback();
+    window.addEventListener("go", (e) => this.go(e.detail.route));
+    this.go("notes-container");
   }
 
   go(route) {
