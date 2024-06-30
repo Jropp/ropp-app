@@ -21,7 +21,7 @@ class AppEnter extends LitElement {
     super.connectedCallback();
     window.addEventListener("go", (e) => this.go(e.detail.route));
 
-    if (!getSessionUser() {
+    if (!getSessionUser()) {
       this.go("login-container");
     } else {
       this.go("notes-container");
