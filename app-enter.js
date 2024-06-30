@@ -1,6 +1,7 @@
 import { LitElement, html } from "./lib/lit.js";
 import "./env.js";
 import "./ui/views/login-container.js";
+import { getSessionUser } from "./services/session.js";
 
 /** @param {string} route */
 const componentLoader = (route) => import(`./ui/views/${route}.js`);
@@ -19,7 +20,12 @@ class AppEnter extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     window.addEventListener("go", (e) => this.go(e.detail.route));
-    this.go("notes-container");
+
+    if (!getSessionUser() {
+      this.go("login-container");
+    } else {
+      this.go("notes-container");
+    }
   }
 
   go(route) {
