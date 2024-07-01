@@ -24,7 +24,7 @@ export async function deleteNote(id) {
 }
 
 export async function getAllNotes() {
-  return appFetch("/notes/all", { method: 'GET' }).then((r) => console.log(r));
+  return appFetch("/notes/all", { method: 'GET' }).then((r) => r.json());
 }
 
 // /** @param {NewNote} note */

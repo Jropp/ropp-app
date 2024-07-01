@@ -4,7 +4,7 @@ import { getAllNotes, saveNewNote } from "../../services/notes.service.js";
 import { styles } from "../styles.js";
 
 import "../tag-input.js";
-import NoteDetail from "./notes/note-detail.js";
+import "./notes/note-detail.js";
 
 const VIEW_TYPES = {
   NEW: "new",
@@ -22,7 +22,7 @@ class NotesContainer extends LitElement {
   constructor() {
     super();
     /** @type {string} */
-    this.view = VIEW_TYPES.NEW;
+    this.view = VIEW_TYPES.SEARCH;
     /** @type {Note[]} */
     this.notes = [];
     /** @type {boolean} */
@@ -59,10 +59,16 @@ class NotesContainer extends LitElement {
       tags: formData.get("tags")
     });
 
-    this.getNotes();
+    await this.getNotes();
     this.view = VIEW_TYPES.SEARCH;
   }
 
+  handleDetailClick(e) {
+    this.view = VIEW_TYPES.DETAIL;
+    this.detailId = e.target.id;
+
+    // set form display to the selected item.
+  }
   new() {
     return html`
       <form @submit=${this.saveNew}>
@@ -86,14 +92,25 @@ class NotesContainer extends LitElement {
     return html`
       ${this.loading ?
         html`<p>Loading...</p>` :
-        this.notes.map((note) => html`<note-detail .note=${note}></note-detail>`)}
+        html`
+        <button @click=${() => this.view = VIEW_TYPES.NEW}>+</button>
+        <input type="text" />
+        ${this.notes.map((note) => html`
+          <note-detail id="${note.id}" @click=${this.handleDetailClick} .note=${note}></note-detail>
+          `)}
+         `}
 
-    `;
+          `;
   }
 
   static styles = [
     styles,
     css`
+      /* Sett padding on component */
+      :host {
+        display: block;
+        padding: 1rem;
+      } 
       form {
         padding: 16px;
       }

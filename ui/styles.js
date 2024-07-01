@@ -10,18 +10,26 @@ export const styles = css`
   }
 
   button {
+    display: block;
     margin: 0px;
   }
   
   form > * {
     width: 100%;
+    margin: 0px;
   }
 
   textarea, input {
     padding: 0.5rem;
     font-size: 1rem;
+    margin: 0px;
   }
 
+  input {
+    display: block;
+    width: 100%;
+    margin: 0px;
+  }
   button {
     width: 100%;
     padding: 0.5rem;

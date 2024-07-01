@@ -25,8 +25,6 @@ class AppEnter extends LitElement {
     window.addEventListener("go", (/** @type {CustomEvent} */ e) => this.go(e.detail.route));
     this.loggedIn = !!getSessionUser();
 
-    console.log(getSessionUser());
-
     if (!this.loggedIn) {
       this.go("login-container");
     } else {

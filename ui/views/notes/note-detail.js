@@ -1,4 +1,5 @@
-import { LitElement, html } from "../../../lib/lit.js";
+import { LitElement, html, css } from "../../../lib/lit.js";
+import { styles } from "../../styles.js";
 
 export default class NoteDetail extends LitElement {
   static get properties() {
@@ -20,6 +21,15 @@ export default class NoteDetail extends LitElement {
       <em>${this.note.tags}</em>
     `;
   }
+  static styles = [
+    styles,
+    css`
+      p {
+        display: inline-block;
+        white-space: pre-wrap;
+      }
+    `,
+  ];
 }
 
 customElements.define("note-detail", NoteDetail);
