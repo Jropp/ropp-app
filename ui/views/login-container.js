@@ -42,6 +42,7 @@ class LoginContainer extends LitElement {
 
     try {
       const user = await loginUser({ email, password });
+      console.log(user);
       setSessionUser(user);
       window.dispatchEvent(new CustomEvent('go', { detail: { route: 'notes-container' } }));
     } catch (error) {
@@ -63,9 +64,8 @@ class LoginContainer extends LitElement {
             <form @submit=${this.login}>
               <input type="text" name="email" placeholder="email" required />
               <input type="password" name="password" placeholder="Password" required />
-              <button type="submit">Login</button>
+              <button type="submit">Let's Go</button>
             </form>
-            <button @click=${this.toggleView}>Don't have an account? Signup</button>
           `}
     `;
   }
