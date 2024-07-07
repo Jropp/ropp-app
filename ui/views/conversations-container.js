@@ -40,7 +40,6 @@ class ConversationsContainer extends LitElement {
   }
 
   submit() {
-    // @ts-ignors
     sendCreatePrompt(this.shadowRoot.querySelector("textarea").value)
       .then(() => {
         this.getNotes();
@@ -58,11 +57,9 @@ class ConversationsContainer extends LitElement {
   filterResults(search, items, fields) {
     if (search.toLowerCase().startsWith(":all")) return items;
 
-    const result = [...items].filter((item) => {
+    return [...items].filter((item) => {
       return !!fields.some((f) => item[f].toLowerCase().includes(search.toLowerCase()));
     });
-
-    return result;
   }
 
   render() {
@@ -102,6 +99,7 @@ class ConversationsContainer extends LitElement {
       }
       .results {
         display: flex;
+        flex-direction: column;
         padding-top: 16px;
         width: 100%;
         gap: 16px;
