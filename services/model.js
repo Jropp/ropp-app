@@ -26,10 +26,6 @@
 
 /**
  * @typedef UserSignup
- * @property {string}                     first_name
- * @property {string}                     last_name
- * @property {string}                     phone
  * @property {string}                     email
  * @property {string}                     password
- * @property {string}                     country
  */

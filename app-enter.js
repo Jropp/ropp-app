@@ -1,8 +1,13 @@
 import { LitElement, html } from "./lib/lit.js";
 import "./env.js";
 import "./ui/views/login-container.js";
+import "./ui/views/conversations-container.js";
 import { getSessionUser } from "./services/session.js";
 import { styles } from "./ui/styles.js";
+import * as htmx from "./lib/htmx.js";
+// @ts-ignore
+window.htmx = htmx;
+
 /** @param {string} route */
 const componentLoader = (route) => import(`./ui/views/${route}.js`);
 
@@ -28,7 +33,7 @@ class AppEnter extends LitElement {
     if (!this.loggedIn) {
       this.go("login-container");
     } else {
-      this.go("notes-container");
+      this.go("conversations-container");
     }
   }
 
@@ -42,12 +47,14 @@ class AppEnter extends LitElement {
 
   // @ts-ignore
   render() {
-    return html` 
-      ${this.loggedIn ? html`
-          <nav>
-            <a ?hide=${this.route == "notes-container"} @click=${() => this.go("notes-container")}>Notes</a>
-          </nav>
-        ` : null}
+    return html` ${this.loggedIn
+        ? html`
+            <nav>
+              <a @click=${() => this.go("notes-container")}>Notes</a>
+              <a @click=${() => this.go("conversations-container")}>Conversations</a>
+            </nav>
+          `
+        : null}
       <slot></slot>`;
   }
 
