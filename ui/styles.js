@@ -8,26 +8,34 @@ export const styles = css`
     padding: 1rem;
     gap: 1rem;
   }
-
   button {
     display: block;
     margin: 0px;
   }
-  
+  .card {
+    border: solid black 1px;
+    width: 100%;
+    border-radius: 5px;
+    padding: 16px;
+  }
+  .hover:hover {
+    cursor: pointer;
+    opacity: 0.5;
+  }
+  .card h2 {
+    margin: 0px;
+  }
+  .card p {
+    /** TODO: Add new line wrap displaying for p tag*/ 
+  }
   form > * {
     width: 100%;
     margin: 0px;
   }
-
   textarea, input {
-    padding: 0.5rem;
-    font-size: 1rem;
-    margin: 0px;
-  }
-
-  input {
     display: block;
-    width: 100%;
+    padding: 16px;
+    font-size: 1rem;
     margin: 0px;
   }
   button {
@@ -39,7 +47,6 @@ export const styles = css`
     border: solid 1px black;
     cursor: pointer;
   }
-
   [hide] {
     display: none;
   }
