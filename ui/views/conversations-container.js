@@ -3,6 +3,7 @@ import { LitElement, html, css } from "../../lib/lit.js";
 import { getAllNotes } from "../../services/notes.service.js";
 import { sendCreatePrompt } from "../../services/prompt.service.js";
 import "../little-throbber.js";
+import { styles } from "../styles.js";
 
 class ConversationsContainer extends LitElement {
   static properties = {
@@ -13,23 +14,10 @@ class ConversationsContainer extends LitElement {
 
   constructor() {
     super();
-    this.ogNotes = [
-      {
-        title: "John Brown",
-        content: "had a conversation",
-        tags: "goshen, IN, downtown, food"
-      },
-      {
-        title: "James Dean",
-        content: "Has a wombat named steve",
-        tags: "Montieith, MN, downtown, food"
-      },
-    ];
     this.notes = [];
     this.loading = true;
-    this.search = ''
+    this.search = "";
   }
-
 
   connectedCallback() {
     super.connectedCallback();
@@ -39,12 +27,9 @@ class ConversationsContainer extends LitElement {
   getNotes() {
     this.loading = true;
 
-    this.notes = [...this.ogNotes]
-    this.loading = false;
-    return
     getAllNotes()
       .then((r) => {
-        this.notes = this.ogNotes.reverse();
+        this.ogNotes = r.reverse();
       })
       .catch((e) => {
         console.error(e);
@@ -66,16 +51,18 @@ class ConversationsContainer extends LitElement {
   }
 
   searchKeyup(e) {
-    this.search = e.target.value
-    this.notes = this.filterResults(this.search, this.ogNotes, ['title', 'content', 'tags'])
+    this.search = e.target.value;
+    this.notes = this.filterResults(this.search, this.ogNotes, ["title", "content", "tags"]);
   }
 
   filterResults(search, items, fields) {
-    const result = [...items].filter((item) => {
-      return !!fields.some(f => item[f].toLowerCase().includes(search.toLowerCase()))
-    })
+    if (search.toLowerCase().startsWith(":all")) return items;
 
-    return result
+    const result = [...items].filter((item) => {
+      return !!fields.some((f) => item[f].toLowerCase().includes(search.toLowerCase()));
+    });
+
+    return result;
   }
 
   render() {
@@ -83,16 +70,14 @@ class ConversationsContainer extends LitElement {
 
     return html`
       <form>
-        <input type="text" @keyup=${this.searchKeyup} name="search" placeholder="Search"/>
+        <input type="text" @keyup=${this.searchKeyup} name="search" placeholder="Search" />
         <textarea ?hide=${!!this.search} name="prompt"></textarea>
       </form>
       <button ?hide=${!!this.search} @click=${this.submit} type="submit">Create</button>
 
-      ${this.search ? html`
-        <div ?hide=${!this.search} class="results">
-          ${this.notes.map((c) => this.renderConversation(c))}
-        </div>
-        ` : null}
+      ${this.search
+        ? html` <div ?hide=${!this.search} class="results">${this.notes.map((c) => this.renderConversation(c))}</div> `
+        : null}
     `;
   }
 
