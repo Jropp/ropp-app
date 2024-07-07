@@ -28,25 +28,7 @@ self.addEventListener('install', function() {
     "/services/notes.service.js",
     "/services/notes.model.js",
     "/services/model.js",
-    "/services/app-fetch.js",
-    "ui/little-throbber.js",
-    "ui/tag-input.js",
-    "ui/views/user-dashboard.js",
-    "ui/views/conversations-container.js",
-    "ui/views/notes/note-detail.js",
-    "ui/views/user-settings.js",
-    "ui/views/login-container.js",
-    "ui/views/notes-container.js",
-    "ui/styles.js",
-    "services/user.service.js",
-    "services/session.js",
-    "services/prompt.service.js",
-    "services/notes.service.js",
-    "services/notes.model.js",
-    "services/model.js",
-    "services/app-fetch.js",
-    "lib/lit.js",
-    "lib/htmx.js",
+    "/services/app-fetch.js"
   ]).then(() => {
     console.log("Resources added to cache");
   });

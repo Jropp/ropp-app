@@ -49,10 +49,13 @@ class LoginContainer extends LitElement {
 
     try {
       const user = await loginUser({ email, password });
-      console.log(user);
+
+      if (!user.id) {
+        throw new Error("Login failed");
+      }
       setSessionUser(user);
       window.dispatchEvent(new CustomEvent("go", { detail: { route: "conversations-container" } }));
-    } catch (error) {}
+    } catch (error) { }
   }
 
   render() {
