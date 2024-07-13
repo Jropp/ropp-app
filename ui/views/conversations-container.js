@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { LitElement, html, css } from "../../lib/lit.js";
-import { getAllNotes } from "../../services/notes.service.js";
+import { deleteNote, getAllNotes } from "../../services/notes.service.js";
 import { sendCreatePrompt } from "../../services/prompt.service.js";
 import "../little-throbber.js";
 import { styles } from "../styles.js";
@@ -24,19 +24,13 @@ class ConversationsContainer extends LitElement {
     this.getNotes();
   }
 
-  getNotes() {
+  async getNotes() {
     this.loading = true;
 
-    getAllNotes()
-      .then((r) => {
-        this.ogNotes = r.reverse();
-      })
-      .catch((e) => {
-        console.error(e);
-      })
-      .finally(() => {
-        this.loading = false;
-      });
+    const r = await getAllNotes();
+    this.ogNotes = r.reverse();
+
+    this.loading = false;
   }
 
   submit() {
@@ -52,6 +46,13 @@ class ConversationsContainer extends LitElement {
   searchKeyup(e) {
     this.search = e.target.value;
     this.notes = this.filterResults(this.search, this.ogNotes, ["title", "content", "tags"]);
+  }
+
+  async deleteItem(item) {
+    await deleteNote(item.id);
+
+    await this.getNotes();
+    this.notes = this.ogNotes;
   }
 
   filterResults(search, items, fields) {
@@ -80,10 +81,15 @@ class ConversationsContainer extends LitElement {
 
   renderConversation(conversation) {
     return html`
-      <div class="card hover">
-        <h2>${conversation.title}</h2>
-        <p>${conversation.content}</p>
-        <em>${conversation.tags}</em>
+      <div class="card">
+        <div class="content">
+          <h2>${conversation.title}</h2>
+          <p>${conversation.content}</p>
+          <em>${conversation.tags}</em>
+        </div>
+        <div class="actions">
+          <button id=${conversation.id} @click=${() => this.deleteItem(conversation)}>x</button>
+        </div>
       </div>
     `;
   }
@@ -103,6 +109,15 @@ class ConversationsContainer extends LitElement {
         padding-top: 16px;
         width: 100%;
         gap: 16px;
+      }
+      .card {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        cursor: pointer;
       }
     `,
   ];

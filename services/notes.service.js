@@ -18,13 +18,13 @@ export async function updateNote(note) {
 
 /** @param {string} id */
 export async function deleteNote(id) {
-  appFetch(`/notes/${id}`, {
+  appFetch(`/notes/delete?id=${id}`, {
     method: "DELETE",
   }).then((r) => r.json());
 }
 
 export async function getAllNotes() {
-  return appFetch("/notes/all", { method: 'GET' }).then((r) => r.json());
+  return appFetch("/notes/all", { method: "GET" }).then((r) => r.json());
 }
 
 // /** @param {NewNote} note */

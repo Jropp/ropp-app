@@ -12,6 +12,10 @@ export const styles = css`
     display: block;
     margin: 0px;
   }
+  button:hover {
+    cursor: pointer;
+    opacity: 0.5;
+  }
   .card {
     border: solid black 1px;
     width: 100%;
@@ -26,13 +30,14 @@ export const styles = css`
     margin: 0px;
   }
   .card p {
-    /** TODO: Add new line wrap displaying for p tag*/ 
+    /** TODO: Add new line wrap displaying for p tag*/
   }
   form > * {
     width: 100%;
     margin: 0px;
   }
-  textarea, input {
+  textarea,
+  input {
     display: block;
     padding: 16px;
     font-size: 1rem;
@@ -50,4 +55,4 @@ export const styles = css`
   [hide] {
     display: none;
   }
-`
+`;
