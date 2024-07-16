@@ -19,28 +19,26 @@ class ConversationsContainer extends LitElement {
     this.search = "";
   }
 
-  connectedCallback() {
+  async connectedCallback() {
     super.connectedCallback();
-    this.getNotes();
-  }
-
-  async getNotes() {
+    
     this.loading = true;
-
-    const r = await getAllNotes();
-    this.ogNotes = r.reverse();
-
+    this.notes = await this.getNotes();
     this.loading = false;
   }
 
-  submit() {
-    sendCreatePrompt(this.shadowRoot.querySelector("textarea").value)
-      .then(() => {
-        this.getNotes();
-      })
-      .catch(() => {
-        console.error(e);
-      });
+  async getNotes() {
+    const r = await getAllNotes();
+    this.ogNotes = r.reverse();
+    
+    return this.ogNotes
+  }
+
+  async submit() {
+    await sendCreatePrompt(this.shadowRoot.querySelector("textarea").value)
+    this.loading = true;
+    this.notes = await this.getNotes();
+    this.loading = false;
   }
 
   searchKeyup(e) {
@@ -49,10 +47,10 @@ class ConversationsContainer extends LitElement {
   }
 
   async deleteItem(item) {
+    this.loading = true;
     await deleteNote(item.id);
-
-    await this.getNotes();
-    this.notes = this.ogNotes;
+    this.notes = await this.getNotes();
+    this.loading = false;
   }
 
   filterResults(search, items, fields) {
