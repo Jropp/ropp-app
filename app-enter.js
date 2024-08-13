@@ -33,7 +33,7 @@ class AppEnter extends LitElement {
     if (!this.loggedIn) {
       this.go("login-container");
     } else {
-      this.go("conversations-container");
+      this.go("dashboard-container");
     }
   }
 
@@ -53,6 +53,7 @@ class AppEnter extends LitElement {
               <a @click=${() => this.go("dashboard-container")}>Dashboard</a>
               <a @click=${() => this.go("notes-container")}>Notes</a>
               <a @click=${() => this.go("conversations-container")}>Conversations</a>
+              <a @click=${() => this.go("workouts-container")}>Workouts</a>
             </nav>
           `
         : null}
