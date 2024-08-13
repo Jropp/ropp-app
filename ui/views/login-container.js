@@ -14,7 +14,7 @@ class LoginContainer extends LitElement {
 
   constructor() {
     super();
-    this.showSignup = false;
+    this.showSignup = true;
     this.loading = true;
   }
 
@@ -60,6 +60,7 @@ class LoginContainer extends LitElement {
     }
   }
 
+  // @ts-ignore
   render() {
     return html`
       ${this.showSignup
