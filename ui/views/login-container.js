@@ -14,7 +14,7 @@ class LoginContainer extends LitElement {
 
   constructor() {
     super();
-    this.showSignup = true;
+    this.showSignup = false;
     this.loading = true;
   }
 
@@ -54,7 +54,7 @@ class LoginContainer extends LitElement {
         throw new Error("Login failed");
       }
       setSessionUser(user);
-      window.dispatchEvent(new CustomEvent("go", { detail: { route: "conversations-container" } }));
+      window.dispatchEvent(new CustomEvent("go", { detail: { route: "dashboard-container" } }));
     } catch (error) {
       console.error(error);
     }

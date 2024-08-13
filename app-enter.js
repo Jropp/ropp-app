@@ -50,6 +50,7 @@ class AppEnter extends LitElement {
     return html` ${this.loggedIn
         ? html`
             <nav>
+              <a @click=${() => this.go("dashboard-container")}>Dashboard</a>
               <a @click=${() => this.go("notes-container")}>Notes</a>
               <a @click=${() => this.go("conversations-container")}>Conversations</a>
             </nav>
