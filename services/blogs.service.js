@@ -12,7 +12,17 @@ export async function getPost(id) {
   return appFetch(`/v1/blogs?id=${id}`, { method: "GET" }).then((r) => r.json());
 }
 
-// Adding the function from blogs.service.js
 export async function getAllBlogs() {
   return appFetch("/v1/blogs", { method: "GET" }).then((r) => r.json());
+}
+
+// New function to update a blog post
+export async function updateBlog(blogData) {
+  return appFetch("/v1/blogs/update", {
+    method: "PUT",
+    body: blogData, // Stringify the entire blogData object
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((r) => r.json());
 }

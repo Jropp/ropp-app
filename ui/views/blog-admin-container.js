@@ -1,79 +1,103 @@
 import { LitElement, html, css } from "../../lib/lit.js";
-import { createBlog, getAllBlogs } from "../../services/blogs.service.js";
+import { getAllBlogs, updateBlog, createBlog } from "../../services/blogs.service.js";
 import { styles } from "../styles.js";
-import "../tag-input.js"; // Import the tag-input component
+import "../tag-input.js";
 
 class BlogAdminContainer extends LitElement {
   static properties = {
-    view: { type: String },
     posts: { type: Array },
     selectedPost: { type: Object },
+    editMode: { type: Boolean },
+    showNewForm: { type: Boolean },
   };
 
   constructor() {
     super();
-    this.view = "list";
     this.posts = [];
     this.selectedPost = null;
+    this.editMode = false;
+    this.showNewForm = false;
   }
 
   connectedCallback() {
     super.connectedCallback();
-    this.getPosts();
+    this.fetchPosts();
   }
 
-  async getPosts() {
-    // Implement this method to fetch posts from the backend
-    this.posts = await getAllBlogs();
-    this.posts = []; // Placeholder
+  async fetchPosts() {
+    try {
+      this.posts = await getAllBlogs();
+      this.requestUpdate(); // Ensure the component re-renders after fetching posts
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
   }
 
   render() {
+    console.log(this.posts);
     return html`
       <h1>Blog Admin</h1>
-      ${this[this.view]()}
+      <button @click=${this.toggleNewForm}>Add New Blog</button>
+      ${this.showNewForm ? this.renderNewForm() : ""}
+      <h2>Current Blogs</h2>
+      ${this.renderBlogList()} ${this.editMode ? this.renderEditForm(this.selectedPost) : ""}
     `;
   }
 
-  list() {
+  renderBlogList() {
+    console.log(this.posts);
+    if (this.posts.length === 0) {
+      return html`<p>No blogs available.</p>`;
+    }
     return html`
-      <div>
-        <button @click=${() => (this.view = "new")}>New Post</button>
-        <ul>
-          ${this.posts.map(
-            (post) => html`
-              <li>
-                ${post.title}
-                <button @click=${() => this.handleEditClick(post)}>Edit</button>
-                <button @click=${() => this.handleDeleteClick(post)}>Delete</button>
-              </li>
-            `
-          )}
-        </ul>
-      </div>
+      <ul class="blog-list">
+        ${this.posts.map(
+          (post) => html`
+            <li>
+              <a href="#" @click=${(e) => this.handleEditClick(e, post)}>${post.title}</a>
+            </li>
+          `
+        )}
+      </ul>
     `;
   }
 
-  new() {
+  renderNewForm() {
     return html`
       <form @submit=${this.handleNewSubmit}>
         <input name="title" placeholder="Title" required />
         <textarea name="content" placeholder="Content" required></textarea>
         <tag-input name="tags"></tag-input>
         <button type="submit">Save</button>
+        <button type="button" @click=${this.toggleNewForm}>Cancel</button>
       </form>
     `;
   }
 
-  edit() {
+  renderEditForm(post) {
+    if (!post) return null;
     return html`
       <form @submit=${this.handleEditSubmit}>
-        <input name="title" .value=${this.selectedPost.title} required />
-        <textarea name="content" required>${this.selectedPost.content}</textarea>
-        <tag-input name="tags" .tags=${this.selectedPost.tags}></tag-input>
+        <input name="title" .value=${post.title} required />
+        <textarea name="content" required>${post.content}</textarea>
+        <tag-input name="tags" .tags=${post.tags || []}></tag-input>
         <button type="submit">Update</button>
+        <button type="button" @click=${this.cancelEdit}>Cancel</button>
       </form>
     `;
+  }
+
+  toggleNewForm() {
+    this.showNewForm = !this.showNewForm;
+    this.editMode = false;
+    this.selectedPost = null;
+  }
+
+  handleEditClick(e, post) {
+    e.preventDefault();
+    this.selectedPost = post;
+    this.editMode = true;
+    this.showNewForm = false;
   }
 
   async handleNewSubmit(e) {
@@ -88,16 +112,11 @@ class BlogAdminContainer extends LitElement {
     };
     try {
       await createBlog(newPost);
-      await this.getPosts();
-      this.view = "list";
+      await this.fetchPosts();
+      this.showNewForm = false;
     } catch (error) {
       console.error("Error creating post:", error);
     }
-  }
-
-  handleEditClick(post) {
-    this.selectedPost = post;
-    this.view = "edit";
   }
 
   async handleEditSubmit(e) {
@@ -107,26 +126,21 @@ class BlogAdminContainer extends LitElement {
       id: this.selectedPost.id,
       title: formData.get("title"),
       content: formData.get("content"),
-      tags: formData
-        .get("tags")
-        .split(",")
-        .filter((tag) => tag.trim() !== ""),
+      tags: formData.get("tags"), // This will already be a comma-separated string
     };
     try {
-      // Implement updateBlog function in your blog service
-      // await updateBlog(updatedPost);
-      await this.getPosts();
-      this.view = "list";
+      await updateBlog(updatedPost);
+      await this.fetchPosts();
+      this.editMode = false;
+      this.selectedPost = null;
     } catch (error) {
       console.error("Error updating post:", error);
     }
   }
 
-  async handleDeleteClick(post) {
-    if (confirm("Are you sure you want to delete this post?")) {
-      // await deletePost(post.id);
-      await this.getPosts();
-    }
+  cancelEdit() {
+    this.editMode = false;
+    this.selectedPost = null;
   }
 
   static styles = [
@@ -136,22 +150,41 @@ class BlogAdminContainer extends LitElement {
         display: block;
         padding: 1rem;
       }
+      .blog-list {
+        list-style-type: none;
+        padding: 0;
+      }
+      .blog-list li {
+        margin-bottom: 0.5rem;
+      }
+      .blog-list a {
+        color: #007bff;
+        text-decoration: none;
+      }
+      .blog-list a:hover {
+        text-decoration: underline;
+      }
       form {
         display: flex;
         flex-direction: column;
         gap: 1rem;
+        margin-top: 1rem;
       }
       input,
       textarea,
       tag-input {
         padding: 0.5rem;
       }
-      ul {
-        list-style-type: none;
-        padding: 0;
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 4px;
       }
-      li {
-        margin-bottom: 0.5rem;
+      button:hover {
+        background-color: #0056b3;
       }
     `,
   ];
