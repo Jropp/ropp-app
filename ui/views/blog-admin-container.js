@@ -1,8 +1,7 @@
 import { LitElement, html, css } from "../../lib/lit.js";
+import { createBlog, getAllBlogs } from "../../services/blogs.service.js";
 import { styles } from "../styles.js";
 // Import necessary services (to be implemented)
-// import { getAllPosts, saveNewPost, deletePost, updatePost } from "../../services/blog.service.js";
-
 class BlogAdminContainer extends LitElement {
   static properties = {
     view: { type: String },
@@ -24,7 +23,7 @@ class BlogAdminContainer extends LitElement {
 
   async getPosts() {
     // Implement this method to fetch posts from the backend
-    // this.posts = await getAllPosts();
+    this.posts = await getAllBlogs();
     this.posts = []; // Placeholder
   }
 
@@ -80,8 +79,14 @@ class BlogAdminContainer extends LitElement {
     const newPost = {
       title: formData.get("title"),
       content: formData.get("content"),
+      tags: ["test"],
     };
     // await saveNewPost(newPost);
+    try {
+      await createBlog(newPost);
+    } catch (error) {
+      console.error("Error creating post:", error);
+    }
     await this.getPosts();
     this.view = "list";
   }

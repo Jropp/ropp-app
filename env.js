@@ -1,5 +1,5 @@
 // @ts-nocheck
-const currentEnv = "prod";
+const currentEnv = "dev";
 export const env = {
   dev: {
     API_URL: "http://localhost:9990",

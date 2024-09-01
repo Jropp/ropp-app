@@ -85,6 +85,7 @@ class LoginContainer extends LitElement {
               `}
         </div>
       </div>
+      <div class="hidden-signup-button" @click=${this.toggleView}></div>
     `;
   }
 

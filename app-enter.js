@@ -90,6 +90,8 @@ class AppEnter extends LitElement {
               <a @click=${() => this.navigate("notes")}>Notes</a>
               <a @click=${() => this.navigate("conversations")}>Conversations</a>
               <a @click=${() => this.navigate("workouts")}>Workouts</a>
+              <a @click=${() => this.navigate("blog")}>Blog</a>
+              <a @click=${() => this.navigate("blog-admin")}>Blog Admin</a>
             </nav>
           `
         : null}
