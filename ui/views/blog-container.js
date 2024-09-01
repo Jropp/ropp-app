@@ -1,4 +1,4 @@
-import { LitElement, html } from "../../lib/lit.js";
+import { LitElement, html, css } from "../../lib/lit.js";
 import { getAllBlogs, getPost } from "../../services/blogs.service.js";
 
 class BlogContainer extends LitElement {
@@ -7,6 +7,50 @@ class BlogContainer extends LitElement {
     loading: { type: Boolean },
     selectedPost: { type: Object },
   };
+
+  static styles = css`
+    :host {
+      display: block;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      color: #333;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 20px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    article {
+      line-height: 1.6;
+    }
+    .tag {
+      display: inline-block;
+      background-color: #f1f1f1;
+      padding: 5px 10px;
+      margin-right: 5px;
+      border-radius: 20px;
+      font-size: 0.8em;
+    }
+  `;
 
   constructor() {
     super();
@@ -61,6 +105,7 @@ class BlogContainer extends LitElement {
                   <li>
                     <h2>${post.title}</h2>
                     <p>${post.excerpt || post.content.substring(0, 100)}...</p>
+                    ${this.renderTags(post.tags)}
                     <button @click=${() => this.selectPost(post.id)}>Read more</button>
                   </li>
                 `
@@ -74,10 +119,16 @@ class BlogContainer extends LitElement {
     return html`
       <article>
         <h1>${post.title}</h1>
+        ${this.renderTags(post.tags)}
         <p>${post.content}</p>
         <button @click=${() => (this.selectedPost = null)}>Back to list</button>
       </article>
     `;
+  }
+
+  renderTags(tags) {
+    if (!tags || tags.length === 0) return null;
+    return html` <div>${tags.map((tag) => html`<span class="tag">${tag}</span>`)}</div> `;
   }
 }
 

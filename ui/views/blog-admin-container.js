@@ -1,7 +1,8 @@
 import { LitElement, html, css } from "../../lib/lit.js";
 import { createBlog, getAllBlogs } from "../../services/blogs.service.js";
 import { styles } from "../styles.js";
-// Import necessary services (to be implemented)
+import "../tag-input.js"; // Import the tag-input component
+
 class BlogAdminContainer extends LitElement {
   static properties = {
     view: { type: String },
@@ -58,6 +59,7 @@ class BlogAdminContainer extends LitElement {
       <form @submit=${this.handleNewSubmit}>
         <input name="title" placeholder="Title" required />
         <textarea name="content" placeholder="Content" required></textarea>
+        <tag-input name="tags"></tag-input>
         <button type="submit">Save</button>
       </form>
     `;
@@ -68,6 +70,7 @@ class BlogAdminContainer extends LitElement {
       <form @submit=${this.handleEditSubmit}>
         <input name="title" .value=${this.selectedPost.title} required />
         <textarea name="content" required>${this.selectedPost.content}</textarea>
+        <tag-input name="tags" .tags=${this.selectedPost.tags}></tag-input>
         <button type="submit">Update</button>
       </form>
     `;
@@ -79,16 +82,17 @@ class BlogAdminContainer extends LitElement {
     const newPost = {
       title: formData.get("title"),
       content: formData.get("content"),
-      tags: ["test"],
+      tags: String(formData.get("tags"))
+        .split(",")
+        .filter((tag) => tag.trim() !== ""),
     };
-    // await saveNewPost(newPost);
     try {
       await createBlog(newPost);
+      await this.getPosts();
+      this.view = "list";
     } catch (error) {
       console.error("Error creating post:", error);
     }
-    await this.getPosts();
-    this.view = "list";
   }
 
   handleEditClick(post) {
@@ -103,10 +107,19 @@ class BlogAdminContainer extends LitElement {
       id: this.selectedPost.id,
       title: formData.get("title"),
       content: formData.get("content"),
+      tags: formData
+        .get("tags")
+        .split(",")
+        .filter((tag) => tag.trim() !== ""),
     };
-    // await updatePost(updatedPost);
-    await this.getPosts();
-    this.view = "list";
+    try {
+      // Implement updateBlog function in your blog service
+      // await updateBlog(updatedPost);
+      await this.getPosts();
+      this.view = "list";
+    } catch (error) {
+      console.error("Error updating post:", error);
+    }
   }
 
   async handleDeleteClick(post) {
@@ -129,7 +142,8 @@ class BlogAdminContainer extends LitElement {
         gap: 1rem;
       }
       input,
-      textarea {
+      textarea,
+      tag-input {
         padding: 0.5rem;
       }
       ul {
