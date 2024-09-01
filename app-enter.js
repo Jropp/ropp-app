@@ -4,9 +4,6 @@ import "./ui/views/login-container.js";
 import "./ui/views/conversations-container.js";
 import { getSessionUser } from "./services/session.js";
 import { styles } from "./ui/styles.js";
-import * as htmx from "./lib/htmx.js";
-// @ts-ignore
-window.htmx = htmx;
 
 /** @param {string} route */
 const componentLoader = (route) => import(`./ui/views/${route}.js`);

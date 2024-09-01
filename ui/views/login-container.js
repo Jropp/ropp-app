@@ -70,7 +70,7 @@ class LoginContainer extends LitElement {
               <input type="password" name="password" placeholder="Password" required />
               <button type="submit">Signup</button>
             </form>
-            <button @click=${this.toggleView}>Already have an account? Login</button>
+            <button @click=${this.toggleView}>Go To Login</button>
           `
         : html`
             <form @submit=${this.login}>

@@ -3,8 +3,9 @@ import { LitElement, html, css } from "../../lib/lit.js";
 import { deleteNote, getAllNotes } from "../../services/notes.service.js";
 import { sendCreatePrompt } from "../../services/prompt.service.js";
 import "../little-throbber.js";
+import "./text-editor.js";
 import { styles } from "../styles.js";
-
+import { displayText, parseText } from "./text-editor.util.js";
 class ConversationsContainer extends LitElement {
   static properties = {
     notes: { type: Array },
@@ -15,13 +16,16 @@ class ConversationsContainer extends LitElement {
   constructor() {
     super();
     this.notes = [];
-    this.loading = true;
+    this.loading = false;
     this.search = "";
   }
 
   async connectedCallback() {
     super.connectedCallback();
-    
+    this.getNotes();
+  }
+
+  async getNotes() {
     this.loading = true;
     this.notes = await this.getNotes();
     this.loading = false;
@@ -30,12 +34,12 @@ class ConversationsContainer extends LitElement {
   async getNotes() {
     const r = await getAllNotes();
     this.ogNotes = r.reverse();
-    
-    return this.ogNotes
+
+    return this.ogNotes;
   }
 
   async submit() {
-    await sendCreatePrompt(this.shadowRoot.querySelector("textarea").value)
+    await sendCreatePrompt(this.shadowRoot.querySelector("textarea").value);
     this.loading = true;
     this.notes = await this.getNotes();
     this.loading = false;
@@ -65,6 +69,7 @@ class ConversationsContainer extends LitElement {
     if (this.loading) return html`<little-throbber></little-throbber>`;
 
     return html`
+      <text-editor></text-editor>
       <form>
         <input type="text" @keyup=${this.searchKeyup} name="search" placeholder="Search" />
         <textarea ?hide=${!!this.search} name="prompt"></textarea>
