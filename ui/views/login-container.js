@@ -54,7 +54,8 @@ class LoginContainer extends LitElement {
         throw new Error("Login failed");
       }
       setSessionUser(user);
-      window.dispatchEvent(new CustomEvent("go", { detail: { route: "dashboard-container" } }));
+      // Update this line to use hash-based navigation
+      window.location.hash = "#dashboard";
     } catch (error) {
       console.error(error);
     }
