@@ -1,13 +1,17 @@
 {
   "compilerOptions": {
-    "skipLibCheck": true,
-    "outDir": "./dist/",
-    "noImplicitAny": true,
-    "module": "es2022",
-    "target": "es6",
-    "checkJs": true,
+    "target": "ES2020",
+    "module": "ES2020",
+    "moduleResolution": "node",
+    "strict": true,
+    "noEmit": true,
     "allowJs": true,
-    "moduleResolution": "node"
+    "checkJs": true,
+    "jsx": "preserve",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "exclude": ["coverage", "dist", "node_modules"]
+  "include": ["**/*.js", "**/*.jsx"],
+  "exclude": ["node_modules"]
 }
