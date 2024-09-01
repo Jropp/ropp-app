@@ -2,10 +2,17 @@ import { appFetch } from "./app-fetch.js";
 
 /** @param {NewNote} note */
 export async function saveNewNote(note) {
-  appFetch("/notes/create", {
+  const response = await appFetch("/notes/create", {
     method: "POST",
-    body: note,
-  }).then((r) => r.json());
+    body: JSON.stringify(note),
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
 }
 
 /** @param {Note} note */
