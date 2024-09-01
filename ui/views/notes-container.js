@@ -67,9 +67,9 @@ class NotesContainer extends LitElement {
         title: formData.get("title"),
         content: formData.get("content"),
         tags: formData.get("tags"),
-        type: "note", // Add this line
+        type: "note",
       };
-      console.log("Sending note:", newNote); // Add this line for debugging
+      console.log("Sending note:", newNote);
       await saveNewNote(newNote);
 
       await this.getNotes();

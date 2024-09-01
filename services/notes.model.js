@@ -9,7 +9,8 @@
 
 /**
  * @typedef NewNote
- * @property {string}                     title
- * @property {string}                     content
- * @property {string}                   tags
- * */
+ * @property {string} type
+ * @property {string} title
+ * @property {string} content
+ * @property {string} tags
+ */
