@@ -63,11 +63,14 @@ class NotesContainer extends LitElement {
     const formData = new FormData(e.target);
 
     try {
-      await saveNewNote({
+      const newNote = {
         title: formData.get("title"),
         content: formData.get("content"),
         tags: formData.get("tags"),
-      });
+        type: "note", // Add this line
+      };
+      console.log("Sending note:", newNote); // Add this line for debugging
+      await saveNewNote(newNote);
 
       await this.getNotes();
       this.view = VIEW_TYPES.SEARCH;
