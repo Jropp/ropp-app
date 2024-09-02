@@ -1,11 +1,10 @@
 import { appFetch } from "./app-fetch.js";
 
 export async function createBlog(blogData) {
-  console.log(blogData);
   return appFetch("/v1/blogs/create", {
     method: "POST",
     body: blogData,
-  }).then((r) => r.json());
+  });
 }
 
 export async function getPost(id) {
