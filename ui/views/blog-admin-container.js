@@ -70,9 +70,13 @@ class BlogAdminContainer extends LitElement {
       <ul class="blog-list">
         ${this.posts.map(
           (post) => html`
-            <li>
-              <a href="#" @click=${(e) => this.handleEditClick(e, post)}>${post.title}</a>
-              <button class="delete-btn" @click=${() => this.handleDeleteClick(post)}>🗑️</button>
+            <li class="blog-item">
+              <div class="blog-content">
+                <a href="#" @click=${(e) => this.handleEditClick(e, post)} class="blog-title">${post.title}</a>
+              </div>
+              <div class="blog-actions">
+                <button class="delete-btn" @click=${() => this.handleDeleteClick(post)}>🗑️</button>
+              </div>
             </li>
           `
         )}
@@ -187,19 +191,36 @@ class BlogAdminContainer extends LitElement {
         list-style-type: none;
         padding: 0;
       }
-      .blog-list li {
+      .blog-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 0.5rem;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 0.5rem 0;
+      }
+      .blog-content {
+        flex: 1;
+        min-width: 0; /* Allows text to wrap */
+        margin-right: 1rem;
+      }
+      .blog-title {
+        white-space: normal;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
+      .blog-actions {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
       }
       .delete-btn {
         background: none;
         border: none;
         cursor: pointer;
         font-size: 1.2rem;
-        padding: 0;
-        margin-left: 10px;
+        padding: 0.5rem;
+        color: #dc3545;
       }
       .delete-btn:hover {
         opacity: 0.7;
@@ -240,6 +261,14 @@ class BlogAdminContainer extends LitElement {
       .error {
         color: red;
         font-weight: bold;
+      }
+      @media (max-width: 600px) {
+        .blog-item {
+          flex-wrap: nowrap;
+        }
+        .blog-content {
+          margin-right: 0.5rem;
+        }
       }
     `,
   ];
