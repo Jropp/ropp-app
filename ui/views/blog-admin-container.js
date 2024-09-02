@@ -152,8 +152,10 @@ class BlogAdminContainer extends LitElement {
       await createBlog(newPost);
       await this.fetchPosts();
       this.showNewForm = false;
+      this.showAlert("Blog post saved successfully!");
     } catch (error) {
       console.error("Error creating post:", error);
+      this.showAlert("Error saving blog post. Please try again.", "error");
     }
   }
 
@@ -190,6 +192,16 @@ class BlogAdminContainer extends LitElement {
         console.error("Error deleting post:", error);
       }
     }
+  }
+
+  showAlert(message, type = "success") {
+    const alert = document.createElement("div");
+    alert.textContent = message;
+    alert.className = `alert alert-${type}`;
+    this.shadowRoot.appendChild(alert);
+    setTimeout(() => {
+      alert.remove();
+    }, 3000);
   }
 
   static styles = [
@@ -288,6 +300,23 @@ class BlogAdminContainer extends LitElement {
       .error {
         color: red;
         font-weight: bold;
+      }
+      .alert {
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+        font-weight: bold;
+        text-align: center;
+      }
+      .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
       }
       @media (max-width: 600px) {
         .blog-item {
