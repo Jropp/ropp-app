@@ -2,6 +2,7 @@ import { LitElement, html, css } from "../../lib/lit.js";
 import { getAllBlogs, updateBlog, createBlog, deleteBlog } from "../../services/blogs.service.js";
 import { styles } from "../styles.js";
 import "../tag-input.js";
+import "./text-input.js"; // Import the text-input component
 
 class BlogAdminContainer extends LitElement {
   static properties = {
@@ -11,6 +12,7 @@ class BlogAdminContainer extends LitElement {
     showNewForm: { type: Boolean },
     loading: { type: Boolean },
     error: { type: String },
+    content: { type: String }, // Add content property to store the rich text content
   };
 
   constructor() {
@@ -21,6 +23,7 @@ class BlogAdminContainer extends LitElement {
     this.showNewForm = false;
     this.loading = true;
     this.error = null;
+    this.content = ""; // Initialize content property
   }
 
   connectedCallback() {
@@ -77,11 +80,15 @@ class BlogAdminContainer extends LitElement {
     `;
   }
 
+  handleContentChange(e) {
+    this.content = e.detail;
+  }
+
   renderNewForm() {
     return html`
       <form @submit=${this.handleNewSubmit}>
         <input name="title" placeholder="Title" required />
-        <textarea name="content" placeholder="Content" required></textarea>
+        <text-input @input-change=${this.handleContentChange}></text-input>
         <tag-input name="tags"></tag-input>
         <button type="submit">Save</button>
       </form>
@@ -93,7 +100,7 @@ class BlogAdminContainer extends LitElement {
     return html`
       <form @submit=${this.handleEditSubmit}>
         <input name="title" .value=${post.title} required />
-        <textarea name="content" required>${post.content}</textarea>
+        <text-input .value=${post.content} @input-change=${this.handleContentChange}></text-input>
         <tag-input name="tags" .tags=${post.tags || []}></tag-input>
         <button type="submit">Update</button>
         <button type="button" @click=${this.cancelEdit}>Cancel</button>
@@ -120,7 +127,7 @@ class BlogAdminContainer extends LitElement {
     const formData = new FormData(e.target);
     const newPost = {
       title: formData.get("title"),
-      content: formData.get("content"),
+      content: this.content, // Use the rich text content
       tags: String(formData.get("tags"))
         .split(",")
         .filter((tag) => tag.trim() !== ""),
@@ -140,8 +147,8 @@ class BlogAdminContainer extends LitElement {
     const updatedPost = {
       id: this.selectedPost.id,
       title: formData.get("title"),
-      content: formData.get("content"),
-      tags: formData.get("tags"), // This will already be a comma-separated string
+      content: this.content, // Use the rich text content
+      tags: formData.get("tags"),
     };
     try {
       await updateBlog(updatedPost);
