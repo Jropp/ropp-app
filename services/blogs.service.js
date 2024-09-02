@@ -26,3 +26,10 @@ export async function updateBlog(blogData) {
     },
   }).then((r) => r.json());
 }
+
+// New function to delete a blog post
+export async function deleteBlog(id) {
+  return appFetch(`/v1/blogs/delete?id=${id}`, {
+    method: "DELETE",
+  }).then((r) => r.json());
+}

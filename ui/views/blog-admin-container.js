@@ -1,5 +1,5 @@
 import { LitElement, html, css } from "../../lib/lit.js";
-import { getAllBlogs, updateBlog, createBlog } from "../../services/blogs.service.js";
+import { getAllBlogs, updateBlog, createBlog, deleteBlog } from "../../services/blogs.service.js";
 import { styles } from "../styles.js";
 import "../tag-input.js";
 
@@ -45,7 +45,6 @@ class BlogAdminContainer extends LitElement {
   }
 
   renderBlogList() {
-    console.log(this.posts);
     if (this.posts.length === 0) {
       return html`<p>No blogs available.</p>`;
     }
@@ -55,6 +54,7 @@ class BlogAdminContainer extends LitElement {
           (post) => html`
             <li>
               <a href="#" @click=${(e) => this.handleEditClick(e, post)}>${post.title}</a>
+              <button class="delete-btn" @click=${() => this.handleDeleteClick(post)}>🗑️</button>
             </li>
           `
         )}
@@ -143,6 +143,17 @@ class BlogAdminContainer extends LitElement {
     this.selectedPost = null;
   }
 
+  async handleDeleteClick(post) {
+    if (confirm(`Are you sure you want to delete "${post.title}"?`)) {
+      try {
+        await deleteBlog(post.id);
+        await this.fetchPosts();
+      } catch (error) {
+        console.error("Error deleting post:", error);
+      }
+    }
+  }
+
   static styles = [
     styles,
     css`
@@ -155,7 +166,21 @@ class BlogAdminContainer extends LitElement {
         padding: 0;
       }
       .blog-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         margin-bottom: 0.5rem;
+      }
+      .delete-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 0;
+        margin-left: 10px;
+      }
+      .delete-btn:hover {
+        opacity: 0.7;
       }
       .blog-list a {
         color: #007bff;
