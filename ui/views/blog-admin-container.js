@@ -2,7 +2,7 @@ import { LitElement, html, css } from "../../lib/lit.js";
 import { getAllBlogs, updateBlog, createBlog, deleteBlog } from "../../services/blogs.service.js";
 import { styles } from "../styles.js";
 import "../tag-input.js";
-import "./text-input.js"; // Import the text-input component
+import "./text-input.js";
 
 class BlogAdminContainer extends LitElement {
   static properties = {
@@ -12,7 +12,8 @@ class BlogAdminContainer extends LitElement {
     showNewForm: { type: Boolean },
     loading: { type: Boolean },
     error: { type: String },
-    content: { type: String }, // Add content property to store the rich text content
+    content: { type: String },
+    showCurrentBlogs: { type: Boolean },
   };
 
   constructor() {
@@ -23,7 +24,8 @@ class BlogAdminContainer extends LitElement {
     this.showNewForm = false;
     this.loading = true;
     this.error = null;
-    this.content = ""; // Initialize content property
+    this.content = "";
+    this.showCurrentBlogs = false;
   }
 
   connectedCallback() {
@@ -57,9 +59,19 @@ class BlogAdminContainer extends LitElement {
       <h1>Blog Admin</h1>
       <button @click=${this.toggleNewForm}>${this.showNewForm ? "Cancel" : "Add New Blog"}</button>
       ${this.showNewForm ? this.renderNewForm() : ""}
-      <h2>Current Blogs</h2>
-      ${this.renderBlogList()} ${this.editMode ? this.renderEditForm(this.selectedPost) : ""}
+      <div class="current-blogs-section">
+        <h2 @click=${this.toggleCurrentBlogs} class="clickable">
+          Current Blogs
+          <span class="toggle-icon">${this.showCurrentBlogs ? "▼" : "▶"}</span>
+        </h2>
+        ${this.showCurrentBlogs ? this.renderBlogList() : ""}
+      </div>
+      ${this.editMode ? this.renderEditForm(this.selectedPost) : ""}
     `;
+  }
+
+  toggleCurrentBlogs() {
+    this.showCurrentBlogs = !this.showCurrentBlogs;
   }
 
   renderBlogList() {
@@ -131,7 +143,7 @@ class BlogAdminContainer extends LitElement {
     const formData = new FormData(e.target);
     const newPost = {
       title: formData.get("title"),
-      content: this.content, // Use the rich text content
+      content: this.content,
       tags: String(formData.get("tags"))
         .split(",")
         .filter((tag) => tag.trim() !== ""),
@@ -151,7 +163,7 @@ class BlogAdminContainer extends LitElement {
     const updatedPost = {
       id: this.selectedPost.id,
       title: formData.get("title"),
-      content: this.content, // Use the rich text content
+      content: this.content,
       tags: formData.get("tags"),
     };
     try {
@@ -187,6 +199,21 @@ class BlogAdminContainer extends LitElement {
         display: block;
         padding: 1rem;
       }
+      .current-blogs-section {
+        margin-top: 2rem;
+        background-color: #f9f9f9;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        padding: 1rem;
+      }
+      .clickable {
+        cursor: pointer;
+        user-select: none;
+      }
+      .toggle-icon {
+        font-size: 0.8em;
+        margin-left: 0.5rem;
+      }
       .blog-list {
         list-style-type: none;
         padding: 0;
@@ -201,7 +228,7 @@ class BlogAdminContainer extends LitElement {
       }
       .blog-content {
         flex: 1;
-        min-width: 0; /* Allows text to wrap */
+        min-width: 0;
         margin-right: 1rem;
       }
       .blog-title {
