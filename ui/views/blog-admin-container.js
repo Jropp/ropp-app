@@ -9,6 +9,8 @@ class BlogAdminContainer extends LitElement {
     selectedPost: { type: Object },
     editMode: { type: Boolean },
     showNewForm: { type: Boolean },
+    loading: { type: Boolean },
+    error: { type: String },
   };
 
   constructor() {
@@ -17,6 +19,8 @@ class BlogAdminContainer extends LitElement {
     this.selectedPost = null;
     this.editMode = false;
     this.showNewForm = false;
+    this.loading = true;
+    this.error = null;
   }
 
   connectedCallback() {
@@ -25,19 +29,30 @@ class BlogAdminContainer extends LitElement {
   }
 
   async fetchPosts() {
+    this.loading = true;
+    this.error = null;
     try {
       this.posts = await getAllBlogs();
-      this.requestUpdate(); // Ensure the component re-renders after fetching posts
     } catch (error) {
       console.error("Error fetching posts:", error);
+      this.error = "Failed to load blogs. Please try again later.";
+    } finally {
+      this.loading = false;
     }
   }
 
   render() {
-    console.log(this.posts);
+    if (this.loading) {
+      return html`<p>Loading...</p>`;
+    }
+
+    if (this.error) {
+      return html`<p class="error">${this.error}</p>`;
+    }
+
     return html`
       <h1>Blog Admin</h1>
-      <button @click=${this.toggleNewForm}>Add New Blog</button>
+      <button @click=${this.toggleNewForm}>${this.showNewForm ? "Cancel" : "Add New Blog"}</button>
       ${this.showNewForm ? this.renderNewForm() : ""}
       <h2>Current Blogs</h2>
       ${this.renderBlogList()} ${this.editMode ? this.renderEditForm(this.selectedPost) : ""}
@@ -45,7 +60,7 @@ class BlogAdminContainer extends LitElement {
   }
 
   renderBlogList() {
-    if (this.posts.length === 0) {
+    if (!this.posts || this.posts.length === 0) {
       return html`<p>No blogs available.</p>`;
     }
     return html`
@@ -69,7 +84,6 @@ class BlogAdminContainer extends LitElement {
         <textarea name="content" placeholder="Content" required></textarea>
         <tag-input name="tags"></tag-input>
         <button type="submit">Save</button>
-        <button type="button" @click=${this.toggleNewForm}>Cancel</button>
       </form>
     `;
   }
@@ -91,6 +105,7 @@ class BlogAdminContainer extends LitElement {
     this.showNewForm = !this.showNewForm;
     this.editMode = false;
     this.selectedPost = null;
+    this.requestUpdate();
   }
 
   handleEditClick(e, post) {
@@ -194,6 +209,10 @@ class BlogAdminContainer extends LitElement {
         flex-direction: column;
         gap: 1rem;
         margin-top: 1rem;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
       }
       input,
       textarea,
@@ -210,6 +229,10 @@ class BlogAdminContainer extends LitElement {
       }
       button:hover {
         background-color: #0056b3;
+      }
+      .error {
+        color: red;
+        font-weight: bold;
       }
     `,
   ];
