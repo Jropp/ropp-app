@@ -68,7 +68,9 @@ class TextInput extends LitElement {
   formatText(command) {
     if (!this.editor) return;
 
-    this.editor.focus();
+    if (this.editor instanceof HTMLElement) {
+      this.editor.focus();
+    }
     document.execCommand(command, false, null);
     this.updateButtonStates();
     this.handleInput({ target: this.editor });
@@ -149,18 +151,15 @@ class TextInput extends LitElement {
     .preview-toggle {
       margin-left: auto;
     }
-    .editor {
-      border: 1px solid #ccc;
-      padding: 10px;
-      min-height: 100px;
-      margin-bottom: 10px;
-      outline: 2px dashed #007bff;
-    }
+    .editor,
     .preview {
       border: 1px solid #ccc;
       padding: 10px;
       min-height: 100px;
       outline: 2px dashed #007bff;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      white-space: pre-wrap;
     }
   `;
 }
