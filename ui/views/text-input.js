@@ -23,13 +23,29 @@ class TextInput extends LitElement {
     this.editor = this.shadowRoot.querySelector(".editor");
     if (this.editor) {
       this.editor.addEventListener("selectionchange", this.handleSelectionChange.bind(this));
+      this.syncEditorContent(); // Add this line
     }
   }
 
   handleInput(e) {
-    this.value = e.target.innerHTML;
+    const rawHTML = e.target.innerHTML;
+    const decodedHTML = this.decodeHTMLEntities(rawHTML);
+    this.value = decodedHTML;
     this.updateButtonStates();
     this.dispatchEvent(new CustomEvent("input-change", { detail: this.value }));
+  }
+
+  decodeHTMLEntities(html) {
+    const textarea = document.createElement("textarea");
+    textarea.innerHTML = html;
+    return textarea.value;
+  }
+
+  // Add this new method
+  syncEditorContent() {
+    if (this.editor && this.value) {
+      this.editor.innerHTML = this.value;
+    }
   }
 
   updateButtonStates() {
