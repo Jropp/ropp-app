@@ -144,9 +144,11 @@ class BlogAdminContainer extends LitElement {
     const newPost = {
       title: formData.get("title"),
       content: this.content,
-      tags: String(formData.get("tags"))
+      tags: formData
+        .get("tags")
         .split(",")
-        .filter((tag) => tag.trim() !== ""),
+        .map((tag) => tag.trim())
+        .filter((tag) => tag !== ""),
     };
     try {
       await createBlog(newPost);
@@ -166,15 +168,21 @@ class BlogAdminContainer extends LitElement {
       id: this.selectedPost.id,
       title: formData.get("title"),
       content: this.content,
-      tags: formData.get("tags"),
+      tags: formData
+        .get("tags")
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter((tag) => tag !== ""),
     };
     try {
       await updateBlog(updatedPost);
       await this.fetchPosts();
       this.editMode = false;
       this.selectedPost = null;
+      this.showAlert("Blog post updated successfully!");
     } catch (error) {
       console.error("Error updating post:", error);
+      this.showAlert("Error updating blog post. Please try again.", "error");
     }
   }
 
