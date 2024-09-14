@@ -4,7 +4,7 @@ import { appFetch } from "./app-fetch.js";
 export async function saveNewNote(note) {
   const response = await appFetch("/notes/create", {
     method: "POST",
-    body: JSON.stringify(note),
+    body: note,
     headers: {
       "Content-Type": "application/json",
     },

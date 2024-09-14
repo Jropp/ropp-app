@@ -45,6 +45,11 @@ class TagInput extends LitElement {
     }
   `;
 
+  // TODO: something is not working here
+  set value(value) {
+    this.tags = value.split(",");
+  }
+
   handleInput(e) {
     this.inputValue = e.target.value;
   }

@@ -69,10 +69,10 @@ class NotesContainer extends LitElement {
         tags: formData.get("tags"),
         type: "note",
       };
-      console.log("Sending note:", newNote);
-      await saveNewNote(newNote);
 
+      await saveNewNote(newNote);
       await this.getNotes();
+
       this.view = VIEW_TYPES.SEARCH;
     } catch (error) {
       console.error("Error saving new note:", error);
