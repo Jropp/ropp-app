@@ -13,7 +13,6 @@ function setHeaders(overrides = {}, sessionUser = getSessionUser()) {
     "Access-Control-Allow-Origin": "*",
   };
 
-  console.log(sessionUser);
   if (sessionUser?.token) defaultHeaders.Authorization = `Bearer ${sessionUser.token}`;
 
   return { ...defaultHeaders, ...overrides };
@@ -39,4 +38,3 @@ export function appFetch(url, { method = "GET", body, headers = {} }) {
   // return fetch("https://app.jasonropp.com/api" + url, reqInit);
   return fetch(env.API_URL + url, reqInit);
 }
-
