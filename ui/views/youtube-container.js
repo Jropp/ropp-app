@@ -8,6 +8,7 @@ class YouTubeContainer extends LitElement {
     tempBookmark: { type: Object },
     playerWidth: { type: Number },
     playerHeight: { type: Number },
+    playerLoaded: { type: Boolean },
   };
 
   static styles = css`
@@ -61,19 +62,26 @@ class YouTubeContainer extends LitElement {
 
   constructor() {
     super();
-    this.videoUrl = "https://www.youtube.com/watch?v=Z9uMPYB74o0";
+    this.videoUrl = "";
     this.bookmarks = [];
     this.showPopup = false;
     this.tempBookmark = null;
     this.playerWidth = 640;
     this.playerHeight = 360;
+    this.playerLoaded = false;
     this.loadBookmarks();
   }
 
+  connectedCallback() {
+    super.connectedCallback();
+    this.loadBookmarks();
+    this.checkUrlParams();
+  }
+
   firstUpdated() {
-    this.initializeYouTubePlayer();
     this.updatePlayerSize();
     window.addEventListener("resize", this.updatePlayerSize.bind(this));
+    this.checkUrlParams();
   }
 
   disconnectedCallback() {
@@ -84,26 +92,33 @@ class YouTubeContainer extends LitElement {
   render() {
     return html`
       <div>
-        <input type="text" .value="${this.videoUrl}" @input="${this.handleInput}" />
+        <input type="text" .value="${this.videoUrl}" @input="${this.handleInput}" placeholder="Enter YouTube URL" />
         <button @click="${this.loadVideo}">Load</button>
-        <button @click="${this.addBookmark}">Bookmark</button>
+        ${this.playerLoaded ? html`<button @click="${this.addBookmark}">Bookmark</button>` : ""}
       </div>
       <div id="player"></div>
+      ${this.renderBookmarks()} ${this.showPopup ? this.renderPopup() : ""}
+    `;
+  }
+
+  renderBookmarks() {
+    return html`
       <div class="bookmark-list">
         <h3>Bookmarks</h3>
-        ${this.bookmarks.map(
-          (bookmark, index) => html`
-            <div class="bookmark-item">
-              <a href="#youtube" @click="${(e) => this.loadBookmark(e, bookmark)}">
-                ${bookmark.memo ? `[${bookmark.memo}] ` : ""} ${bookmark.videoTitle} -
-                ${this.formatTime(bookmark.timestamp)}
-              </a>
-              <button class="delete-button" @click="${() => this.deleteBookmark(index)}">Delete</button>
-            </div>
-          `
-        )}
+        ${this.bookmarks.length > 0
+          ? this.bookmarks.map(
+              (bookmark, index) => html`
+                <div class="bookmark-item">
+                  <a href="#youtube" @click="${(e) => this.loadBookmark(e, bookmark)}">
+                    ${bookmark.memo ? `[${bookmark.memo}] ` : ""} ${bookmark.videoTitle} -
+                    ${this.formatTime(bookmark.timestamp)}
+                  </a>
+                  <button class="delete-button" @click="${() => this.deleteBookmark(index)}">Delete</button>
+                </div>
+              `
+            )
+          : html`<p>No bookmarks yet. Add some by playing a video and clicking "Bookmark".</p>`}
       </div>
-      ${this.showPopup ? this.renderPopup() : ""}
     `;
   }
 
@@ -145,26 +160,52 @@ class YouTubeContainer extends LitElement {
   }
 
   loadVideo() {
-    if (this.player) {
-      const videoId = this.getVideoId(this.videoUrl);
-      this.player.loadVideoById(videoId);
+    const videoId = this.getVideoId(this.videoUrl);
+    if (videoId) {
+      if (!this.playerLoaded) {
+        this.initializeYouTubePlayer(videoId);
+      } else {
+        this.player.loadVideoById(videoId);
+      }
+      this.playerLoaded = true;
+    } else {
+      console.error("Invalid YouTube URL");
+      // You might want to show an error message to the user here
     }
   }
 
-  initializeYouTubePlayer() {
+  updateUrlWithParams(videoId, timestamp = 0, bookmarkId = null) {
+    const url = new URL(window.location.href);
+    let hashParts = url.hash.split("?");
+    const baseHash = hashParts[0] || "#youtube";
+    const params = new URLSearchParams();
+
+    if (bookmarkId) {
+      params.set("b", bookmarkId);
+    } else if (videoId) {
+      params.set("v", videoId);
+      if (timestamp > 0) {
+        params.set("t", timestamp.toString());
+      }
+    }
+
+    url.hash = params.toString() ? `${baseHash}?${params.toString()}` : baseHash;
+    window.history.replaceState({}, "", url);
+  }
+
+  initializeYouTubePlayer(videoId) {
     if (typeof YT === "undefined" || typeof YT.Player === "undefined") {
       const tag = document.createElement("script");
       tag.src = "https://www.youtube.com/iframe_api";
       const firstScriptTag = document.getElementsByTagName("script")[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-      window.onYouTubeIframeAPIReady = this.createPlayer.bind(this);
+      window.onYouTubeIframeAPIReady = () => this.createPlayer(videoId);
     } else {
-      this.createPlayer();
+      this.createPlayer(videoId);
     }
   }
 
-  createPlayer() {
-    const videoId = this.getVideoId(this.videoUrl);
+  createPlayer(videoId) {
     this.player = new YT.Player(this.shadowRoot.getElementById("player"), {
       height: this.playerHeight,
       width: this.playerWidth,
@@ -176,12 +217,24 @@ class YouTubeContainer extends LitElement {
   }
 
   onPlayerReady(event) {
-    event.target.playVideo();
+    if (this.pendingSeek !== undefined) {
+      this.player.seekTo(this.pendingSeek);
+      this.player.playVideo();
+      delete this.pendingSeek;
+    } else {
+      event.target.playVideo();
+    }
   }
 
   getVideoId(url) {
-    const urlParams = new URLSearchParams(new URL(url).search);
-    return urlParams.get("v");
+    try {
+      const urlObj = new URL(url);
+      const searchParams = new URLSearchParams(urlObj.search);
+      return searchParams.get("v") || urlObj.pathname.split("/").pop();
+    } catch (error) {
+      console.error("Invalid URL:", error);
+      return null;
+    }
   }
 
   addBookmark() {
@@ -206,7 +259,7 @@ class YouTubeContainer extends LitElement {
   saveBookmarkWithMemo() {
     const memoInput = this.shadowRoot.getElementById("memoInput");
     const memo = memoInput.value.trim();
-    const bookmark = { ...this.tempBookmark, memo };
+    const bookmark = { ...this.tempBookmark, memo, id: Date.now().toString() };
     this.bookmarks = [...this.bookmarks, bookmark];
     this.saveBookmarks();
     this.closePopup();
@@ -219,10 +272,19 @@ class YouTubeContainer extends LitElement {
 
   loadBookmark(e, bookmark) {
     e.preventDefault();
-    if (this.player) {
+    this.videoUrl = `https://www.youtube.com/watch?v=${bookmark.videoId}`;
+
+    if (!this.player) {
+      // If the player doesn't exist, initialize it with the bookmarked video
+      this.initializeYouTubePlayer(bookmark.videoId);
+      this.pendingSeek = bookmark.timestamp;
+    } else {
+      // If the player exists, load the bookmarked video
       this.player.loadVideoById(bookmark.videoId, bookmark.timestamp);
-      window.location.hash = `youtube?v=${bookmark.videoId}&t=${bookmark.timestamp}`;
     }
+
+    this.playerLoaded = true;
+    this.updateUrlWithParams(null, null, bookmark.id);
   }
 
   formatTime(seconds) {
@@ -246,6 +308,37 @@ class YouTubeContainer extends LitElement {
     this.bookmarks = this.bookmarks.filter((_, i) => i !== index);
     this.saveBookmarks();
     this.requestUpdate();
+  }
+
+  checkUrlParams() {
+    const hashParams = new URLSearchParams(this.getAttribute("hash-params").split("?")[1] || "");
+    const bookmarkId = hashParams.get("b");
+    const videoId = hashParams.get("v");
+    const timestamp = hashParams.get("t");
+
+    if (bookmarkId) {
+      const bookmark = this.bookmarks.find((b) => b.id === bookmarkId);
+      if (bookmark) {
+        this.videoUrl = `https://www.youtube.com/watch?v=${bookmark.videoId}`;
+        this.loadVideo();
+        this.pendingSeek = bookmark.timestamp;
+      }
+    } else if (videoId) {
+      this.videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+      this.loadVideo();
+      if (timestamp) {
+        const seekTo = parseInt(timestamp, 10);
+        if (!isNaN(seekTo)) {
+          this.pendingSeek = seekTo;
+        }
+      }
+    }
+  }
+
+  updateUrlWithBookmarkId(bookmarkId) {
+    const url = new URL(window.location.href);
+    url.hash = `#youtube?bookmark=${bookmarkId}`;
+    window.history.replaceState({}, "", url);
   }
 }
 
