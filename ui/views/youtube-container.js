@@ -53,10 +53,26 @@ class YouTubeContainer extends LitElement {
       border: 1px solid #ccc;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       z-index: 1000;
+      width: 300px;
     }
     .popup input {
       width: 100%;
       margin-bottom: 10px;
+    }
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+    }
+    .button-group button {
+      flex: 1;
+      margin: 0 5px;
+    }
+    .popup input:focus,
+    .popup button:focus {
+      outline: 2px solid #3498db;
+    }
+    .popup button {
+      cursor: pointer;
     }
   `;
 
@@ -70,23 +86,28 @@ class YouTubeContainer extends LitElement {
     this.playerHeight = 360;
     this.playerLoaded = false;
     this.loadBookmarks();
+    this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
   connectedCallback() {
     super.connectedCallback();
     this.loadBookmarks();
     this.checkUrlParams();
-  }
-
-  firstUpdated() {
-    this.updatePlayerSize();
-    window.addEventListener("resize", this.updatePlayerSize.bind(this));
-    this.checkUrlParams();
+    window.addEventListener("keydown", this.handleKeyDown);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     window.removeEventListener("resize", this.updatePlayerSize.bind(this));
+    window.removeEventListener("keydown", this.handleKeyDown);
+  }
+
+  handleKeyDown(event) {
+    // Check for Command+B (Mac) or Ctrl+B (Windows/Linux)
+    if ((event.metaKey || event.ctrlKey) && event.key === "b") {
+      event.preventDefault(); // Prevent the default browser action
+      this.addBookmark();
+    }
   }
 
   render() {
@@ -141,18 +162,57 @@ class YouTubeContainer extends LitElement {
   }
 
   renderPopup() {
+    const currentTime = this.tempBookmark ? this.tempBookmark.timestamp : 0;
     return html`
       <div class="popup">
+        <p>Current Time: ${this.formatTime(currentTime)}</p>
         <input
           type="text"
           id="memoInput"
           placeholder="Enter a memo for this bookmark"
-          @keyup="${this.handleMemoKeyup}"
+          @keydown="${this.handlePopupKeydown}"
         />
-        <button @click="${this.saveBookmarkWithMemo}">Save</button>
-        <button @click="${this.closePopup}">Cancel</button>
+        <div class="button-group">
+          <button @click="${() => this.saveBookmarkWithOffset(-60)}" tabindex="0">-60s</button>
+          <button @click="${() => this.saveBookmarkWithOffset(-30)}" tabindex="0">-30s</button>
+          <button @click="${() => this.saveBookmarkWithOffset(-15)}" tabindex="0">-15s</button>
+          <button @click="${this.closePopup}" tabindex="0">Cancel</button>
+        </div>
       </div>
     `;
+  }
+
+  handlePopupKeydown(e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      this.saveBookmarkWithOffset(-10);
+    } else if (e.key === "Tab") {
+      e.preventDefault();
+      this.focusNextElement(e.shiftKey);
+    }
+  }
+
+  focusNextElement(reverse = false) {
+    const focusableElements = this.shadowRoot.querySelectorAll("input, button");
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+    const activeElement = this.shadowRoot.activeElement;
+
+    if (reverse) {
+      if (activeElement === firstElement || !activeElement) {
+        lastElement.focus();
+      } else {
+        const currentIndex = Array.from(focusableElements).indexOf(activeElement);
+        focusableElements[currentIndex - 1].focus();
+      }
+    } else {
+      if (activeElement === lastElement || !activeElement) {
+        firstElement.focus();
+      } else {
+        const currentIndex = Array.from(focusableElements).indexOf(activeElement);
+        focusableElements[currentIndex + 1].focus();
+      }
+    }
   }
 
   handleInput(e) {
@@ -238,7 +298,7 @@ class YouTubeContainer extends LitElement {
   }
 
   addBookmark() {
-    if (this.player) {
+    if (this.player && this.playerLoaded) {
       const videoId = this.player.getVideoData().video_id;
       const timestamp = Math.floor(this.player.getCurrentTime());
       const videoTitle = this.player.getVideoData().title;
@@ -246,14 +306,29 @@ class YouTubeContainer extends LitElement {
       this.showPopup = true;
       this.requestUpdate();
       // Focus on the memo input after the popup is rendered
-      setTimeout(() => this.shadowRoot.getElementById("memoInput").focus(), 0);
+      setTimeout(() => {
+        const memoInput = this.shadowRoot.getElementById("memoInput");
+        if (memoInput) {
+          memoInput.focus();
+        }
+      }, 0);
     }
   }
 
   handleMemoKeyup(e) {
     if (e.key === "Enter") {
-      this.saveBookmarkWithMemo();
+      this.saveBookmarkWithOffset(-10);
     }
+  }
+
+  saveBookmarkWithOffset(offset) {
+    const memoInput = this.shadowRoot.getElementById("memoInput");
+    const memo = memoInput.value.trim();
+    const adjustedTimestamp = Math.max(0, this.tempBookmark.timestamp + offset);
+    const bookmark = { ...this.tempBookmark, memo, timestamp: adjustedTimestamp, id: Date.now().toString() };
+    this.bookmarks = [...this.bookmarks, bookmark];
+    this.saveBookmarks();
+    this.closePopup();
   }
 
   saveBookmarkWithMemo() {

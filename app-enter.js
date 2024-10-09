@@ -18,6 +18,7 @@ class AppEnter extends LitElement {
 
   constructor() {
     super();
+    /** @type {User} */
     this.user = null;
     this.loggedIn = false;
     this.route = "";
@@ -39,11 +40,11 @@ class AppEnter extends LitElement {
     const hash = window.location.hash.slice(1);
     if (!hash) {
       // No route specified, redirect based on login status
-      if (this.loggedIn) {
-        window.location.hash = "#dashboard";
-      } else {
-        window.location.hash = "#login";
-      }
+      // if (this.loggedIn) {
+      window.location.hash = "#dashboard";
+      // } else {
+      //   window.location.hash = "#login";
+      // }
     } else {
       // Route specified, navigate to it
       this.handleHashChange();
@@ -52,14 +53,12 @@ class AppEnter extends LitElement {
 
   handleHashChange() {
     this.updateLoginStatus();
-    const hash = window.location.hash.slice(1) || "dashboard";
+    const fullHash = window.location.hash.slice(1);
+    const hashParts = fullHash.split("?");
+    const hash = hashParts[0] || "dashboard";
     const route = `${hash}-container`;
 
-    if (!this.loggedIn && hash !== "login") {
-      window.location.hash = "#login";
-    } else {
-      this.loadComponent(route);
-    }
+    this.loadComponent(route);
   }
 
   updateLoginStatus() {
@@ -79,7 +78,10 @@ class AppEnter extends LitElement {
   loadComponent(route) {
     this.route = route;
     componentLoader(route).then(() => {
-      this.shadowRoot.querySelector("slot").innerHTML = `<${route}></${route}>`;
+      const element = document.createElement(route);
+      element.setAttribute("hash-params", window.location.hash);
+      this.shadowRoot.querySelector("slot").innerHTML = "";
+      this.shadowRoot.querySelector("slot").appendChild(element);
     });
   }
 
