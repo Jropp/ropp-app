@@ -3,6 +3,7 @@ import { LitElement, html, css } from "../../lib/lit.js";
 class YouTubeContainer extends LitElement {
   static properties = {
     videoUrl: { type: String },
+    bookmarks: { type: Array },
   };
 
   static styles = css`
@@ -17,11 +18,19 @@ class YouTubeContainer extends LitElement {
     #player {
       margin-top: 16px;
     }
+    .bookmark-list {
+      margin-top: 16px;
+    }
+    .bookmark-item {
+      margin-bottom: 8px;
+    }
   `;
 
   constructor() {
     super();
     this.videoUrl = "https://www.youtube.com/watch?v=Z9uMPYB74o0";
+    this.bookmarks = [];
+    this.loadBookmarks();
   }
 
   firstUpdated() {
@@ -33,8 +42,21 @@ class YouTubeContainer extends LitElement {
       <div>
         <input type="text" .value="${this.videoUrl}" @input="${this.handleInput}" />
         <button @click="${this.loadVideo}">Load</button>
+        <button @click="${this.addBookmark}">Bookmark</button>
       </div>
       <div id="player"></div>
+      <div class="bookmark-list">
+        <h3>Bookmarks</h3>
+        ${this.bookmarks.map(
+          (bookmark) => html`
+            <div class="bookmark-item">
+              <a href="#youtube" @click="${(e) => this.loadBookmark(e, bookmark)}">
+                ${bookmark.videoId} - ${this.formatTime(bookmark.timestamp)}
+              </a>
+            </div>
+          `
+        )}
+      </div>
     `;
   }
 
@@ -80,6 +102,42 @@ class YouTubeContainer extends LitElement {
   getVideoId(url) {
     const urlParams = new URLSearchParams(new URL(url).search);
     return urlParams.get("v");
+  }
+
+  addBookmark() {
+    if (this.player) {
+      const videoId = this.player.getVideoData().video_id;
+      const timestamp = Math.floor(this.player.getCurrentTime());
+      const bookmark = { videoId, timestamp };
+      this.bookmarks = [...this.bookmarks, bookmark];
+      this.saveBookmarks();
+    }
+  }
+
+  loadBookmark(e, bookmark) {
+    e.preventDefault(); // Prevent default link behavior
+    if (this.player) {
+      this.player.loadVideoById(bookmark.videoId, bookmark.timestamp);
+      // Update the URL hash
+      window.location.hash = `youtube?v=${bookmark.videoId}&t=${bookmark.timestamp}`;
+    }
+  }
+
+  formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  }
+
+  saveBookmarks() {
+    localStorage.setItem("youtubeBookmarks", JSON.stringify(this.bookmarks));
+  }
+
+  loadBookmarks() {
+    const savedBookmarks = localStorage.getItem("youtubeBookmarks");
+    if (savedBookmarks) {
+      this.bookmarks = JSON.parse(savedBookmarks);
+    }
   }
 }
 
