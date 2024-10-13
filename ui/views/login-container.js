@@ -26,7 +26,7 @@ class LoginContainer extends LitElement {
   async signup(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const email = String(formData.get("email"));
+    const email = String(formData.get("email")).toLowerCase();
     const password = String(formData.get("password"));
     this.loading = true;
 
