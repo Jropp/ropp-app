@@ -10,7 +10,7 @@ class TagInput extends LitElement {
 
   constructor() {
     super();
-    /** @type {string[]} */
+    /** @type {Todo[]} */
     this.tags = [];
     this.inputValue = "";
     this.internals_ = this.attachInternals();
@@ -48,6 +48,7 @@ class TagInput extends LitElement {
   // TODO: something is not working here
   set value(value) {
     this.tags = value.split(",");
+    this.updateFormValue();
   }
 
   handleInput(e) {
