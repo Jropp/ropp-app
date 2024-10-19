@@ -3,6 +3,7 @@ import { getSessionUser } from "../../services/session.js";
 import { styles } from "../styles.js";
 import "../little-throbber.js";
 import { getExercises } from "../../services/workouts.service.js";
+import ComponentBase from "../../lib/component-base.js";
 
 /**
  * @typedef {Object} Exercise
@@ -18,33 +19,39 @@ import { getExercises } from "../../services/workouts.service.js";
  * @property {Exercise[]} exercises
  */
 
-class WorkoutsContainer extends LitElement {
-  static properties = {
-    exercises: { type: Array },
-    workouts: { type: Array },
-    selectedWorkout: { type: Object },
-    workoutStartTime: { type: Number },
-    isWorkoutActive: { type: Boolean },
-    isCreateWorkoutOpen: { type: Boolean },
-    newWorkoutName: { type: String },
-    newWorkoutExercises: { type: Array },
-  };
+class WorkoutsContainer extends ComponentBase {
+  __exercises = { type: Array };
+  /** @type {Exercise[]} */
+  exercises;
+
+  __workouts = { type: Array };
+  /** @type {Workout[]} */
+  workouts;
+
+  __selectedWorkout = { type: Object };
+  /** @type {Workout|null} */
+  selectedWorkout;
+
+  __workoutStartTime = { type: Number };
+  /** @type {number|null} */
+  workoutStartTime;
+
+  __isWorkoutActive = { type: Boolean };
+  isWorkoutActive;
+
+  __isCreateWorkoutOpen = { type: Boolean };
+  isCreateWorkoutOpen;
+
+  __newWorkoutName = { type: String };
+  newWorkoutName;
+
+  __newWorkoutExercises = { type: Array };
+  /** @type {Exercise[]} */
+  newWorkoutExercises;
 
   constructor() {
     super();
-    /** @type {Exercise[]} */
-    this.exercises = [];
-    /** @type {Workout[]} */
-    this.workouts = [];
-    /** @type {Workout|null} */
-    this.selectedWorkout = null;
-    /** @type {number|null} */
-    this.workoutStartTime = null;
-    this.isWorkoutActive = false;
-    this.isCreateWorkoutOpen = false;
-    this.newWorkoutName = "";
-    /** @type {Exercise[]} */
-    this.newWorkoutExercises = [];
+    this.initProperties();
   }
 
   connectedCallback() {
