@@ -1,14 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, shrink-to-fit=no" />
+
+    <!-- Icon for iOS app image -->
+    <link rel="apple-touch-icon" href="./img/hats/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./img/hats/icon-180.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="./img/hats/icon-167.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="./img/hats/icon-152.png" />
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Ropp App" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <meta name="theme-color" content="#6f2519" />
+    <link rel="manifest" href="/manifest.json" />
+    <script type="module" src="app-enter.js"></script>
     <title>Ropp App</title>
   </head>
 
   <body>
-    <script src="index.js"></script>
-    <script type="module" src="app-enter.js"></script>
+    <script>
+      // Check if the app is installed
+      const isInstalled = window.matchMedia("(display-mode: standalone)").matches;
+
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/service-worker.js", { scope: "/" })
+            .then((registration) => {
+              console.log("SW registered: ", registration);
+
+              // Check for service worker updates
+              registration.addEventListener("updatefound", () => {
+                const installingWorker = registration.installing;
+                installingWorker.addEventListener("statechange", () => {
+                  if (installingWorker.state === "installed" && navigator.serviceWorker.controller) {
+                    // A new service worker is installed and ready to activate
+                    if (isInstalled) {
+                      dialog.showModal();
+                    }
+                  }
+                });
+              });
+            })
+            .catch((registrationError) => {
+              console.log("SW registration failed: ", registrationError);
+            });
+        });
+      }
+
+      function updateHeight() {
+        document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`);
+      }
+
+      window.addEventListener("resize", updateHeight);
+      window.addEventListener("load", updateHeight);
+    </script>
+
+    <dialog id="install-dialog">
+      <h3>Update Available</h3>
+      <p>A new version of the app is available. Install update now?</p>
+      <div class="button-wrap">
+        <button id="install-button">Install</button>
+        <button id="close-button">Close</button>
+      </div>
+    </dialog>
+    <script>
+      const dialog = document.getElementById("install-dialog");
+      const installButton = document.getElementById("install-button");
+      const closeButton = document.getElementById("close-button");
+
+      installButton.addEventListener("click", () => {
+        console.log("installing");
+        window.location.reload();
+      });
+      closeButton.addEventListener("click", () => {
+        console.log("closing");
+        dialog.close();
+      });
+    </script>
+    <style>
+      /* Add your styles here */
+      /* Example styles can be added as needed */
+    </style>
     <app-enter></app-enter>
+    <noscript>Your browser does not support JavaScript!</noscript>
   </body>
 </html>
