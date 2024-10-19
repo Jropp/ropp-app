@@ -41,7 +41,6 @@ export default (SuperClass) => {
 
     async urlChange() {
       const { pathname, search } = window.location;
-      console.log(clientRoutes);
       // ts-ignore
       if (pathname === "/") return go(clientRoutes.LOGIN.path);
 

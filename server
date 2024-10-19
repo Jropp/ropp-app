@@ -8,6 +8,11 @@ serve() {
   http-server -p $PORT -c-1 -P "http://localhost:$PORT?" -o index.html
 }
 
+# Function to refresh Chrome
+refresh_chrome() {
+  osascript -e 'tell application "Google Chrome" to tell the active tab of its first window to reload'
+}
+
 # Start serving index.html and open Chrome
 serve &
 
@@ -19,4 +24,5 @@ fswatch -o index.html | while read; do
   echo "index.html has changed, reloading..."
   kill $(jobs -p) # Kill the current server
   serve # Restart the server
+  refresh_chrome # Refresh the Chrome window
 done
