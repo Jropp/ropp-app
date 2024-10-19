@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Set the port number
+PORT=3000
+
+# Function to serve index.html
+serve() {
+  http-server -p $PORT -c-1 -P "http://localhost:$PORT?" -o index.html
+}
+
+# Start serving index.html and open Chrome
+serve &
+
+# Open Chrome to the specified URL
+open -a "Google Chrome" "http://localhost:$PORT"
+
+# Watch for changes in index.html
+fswatch -o index.html | while read; do
+  echo "index.html has changed, reloading..."
+  kill $(jobs -p) # Kill the current server
+  serve # Restart the server
+done
