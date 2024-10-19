@@ -1,7 +1,6 @@
 import { LitElement, html, css } from "./lib/lit.js";
 import "./env.js";
 import "./ui/views/login-container.js";
-import "./ui/views/conversations-container.js";
 import { getSessionUser } from "./services/session.js";
 import { styles } from "./ui/styles.js";
 
