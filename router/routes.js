@@ -31,14 +31,11 @@ export function processRoute(key, route, parent = null) {
     children: route.children || {},
   };
 
-  console.log(`Processing route: ${key}`, processed);
-
   processed.children = processRoutes(processed.children, processed);
   return processed;
 }
 
 function processRoutes(routes, parentRoute = null) {
-  console.log(`Processing routes:`, routes);
   return Object.entries(routes).reduce((acc, [key, route]) => {
     acc[key] = processRoute(key, route, parentRoute);
     return acc;
@@ -58,7 +55,5 @@ const clientRoutes = processRoutes({
   BLOG_ADMIN: {},
   NOTES: {},
 });
-
-console.log("Final processed routes:", clientRoutes);
 
 export default clientRoutes;
