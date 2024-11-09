@@ -1,6 +1,6 @@
-const VERSION = "1.0.0";
-self.addEventListener('install', function() {
-  console.log('Service worker installing...');
+const VERSION = "1.0.1";
+self.addEventListener("install", function () {
+  console.log("Service worker installing...");
   addResourcesToCache([
     "/ui/little-throbber.js",
     "/ui/tag-input.js",
@@ -28,18 +28,18 @@ self.addEventListener('install', function() {
     "/services/notes.service.js",
     "/services/notes.model.js",
     "/services/model.js",
-    "/services/app-fetch.js"
+    "/services/app-fetch.js",
   ]).then(() => {
     console.log("Resources added to cache");
   });
 });
 
-self.addEventListener('activate', function() {
-  console.log('Service worker activating...');
-})
+self.addEventListener("activate", function () {
+  console.log("Service worker activating...");
+});
 
 /** @param {string[]} resources */
 async function addResourcesToCache(resources) {
   const cache = await caches.open(VERSION);
   await cache.addAll(resources);
-};
+}

@@ -6,7 +6,8 @@ import { pathToRegexp } from "../lib/path-to-regexp.js";
  */
 export function getComponentName(path) {
   const trimmedPath = path.startsWith("/") ? path.slice(1) : path;
-  return `${trimmedPath.replace(/\//g, "-")}-container`;
+  // replace underscores with dashes
+  return `${trimmedPath.replace(/_/g, "-")}-container`;
 }
 
 /**
@@ -18,7 +19,7 @@ export function getComponentName(path) {
  */
 export function processRoute(key, route, parent = null) {
   route.id = route.id || key;
-  const path = route.path || `/${key.toLowerCase()}`;
+  const path = route.path || `/${key.toLowerCase().replace(/_/g, "-")}`;
   const componentName = getComponentName(path);
 
   const processed = {
@@ -42,6 +43,7 @@ function processRoutes(routes, parentRoute = null) {
   }, {});
 }
 
+/** @type {Record<string, Route>} */
 const clientRoutes = processRoutes({
   LOGIN: {
     showHeader: true,
@@ -53,7 +55,16 @@ const clientRoutes = processRoutes({
   WORKOUTS: {},
   BLOG: {},
   BLOG_ADMIN: {},
+  PROJECT_BOARD: {
+    public: true,
+  },
   NOTES: {},
+  YOUTUBE: {
+    public: true,
+  },
+  SANDBOX: {
+    public: true,
+  },
 });
 
 export default clientRoutes;

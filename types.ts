@@ -1,6 +1,0 @@
-// create type for user
-type User = {
-  id: number;
-  name: string;
-  email: string;
-};
