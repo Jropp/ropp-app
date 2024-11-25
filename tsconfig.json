@@ -9,9 +9,8 @@
     "checkJs": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["./types.d.ts"],
+    "types": ["types.d.ts"],
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["**/*.js", "**/*.jsx"],
   "exclude": ["node_modules"]
 }

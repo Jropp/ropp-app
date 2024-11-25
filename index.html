@@ -83,8 +83,39 @@
       });
     </script>
     <style>
-      /* Add your styles here */
-      /* Example styles can be added as needed */
+      :root {
+        /* Color Palette */
+        --color-white: #ffffff;
+        --color-blue-light: #00a7e1;
+        --color-blue-dark: #00171f;
+        --color-blue-medium: #003459;
+        --color-blue-accent: #007ea7;
+
+        /* Functional Colors */
+        --color-background: var(--color-white);
+        --color-primary: var(--color-blue-accent);
+        --color-secondary: var(--color-blue-light);
+        --color-text: var(--color-blue-dark);
+        --color-accent: var(--color-blue-medium);
+
+        /* Status Colors */
+        --color-success: var(--color-blue-light);
+        --color-error: #f44336; /* Keeping red for errors */
+
+        /* Component Colors */
+        --color-button-primary: var(--color-blue-accent);
+        --color-button-secondary: var(--color-blue-light);
+        --color-card-background: var(--color-white);
+        --color-card-border: var(--color-blue-medium);
+      }
+
+      body {
+        background-color: var(--color-background);
+        color: var(--color-text);
+        margin: 0;
+        padding: 0;
+        font-family: Helvetica, Arial, sans-serif;
+      }
     </style>
     <app-enter></app-enter>
     <noscript>Your browser does not support JavaScript!</noscript>

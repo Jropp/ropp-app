@@ -52,7 +52,9 @@ const clientRoutes = processRoutes({
     showHeader: true,
   },
   DASHBOARD: {},
-  WORKOUTS: {},
+  WORKOUTS: {
+    public: true,
+  },
   BLOG: {},
   BLOG_ADMIN: {},
   PROJECT_BOARD: {
@@ -60,6 +62,9 @@ const clientRoutes = processRoutes({
   },
   NOTES: {},
   YOUTUBE: {
+    public: true,
+  },
+  FLIGHTS: {
     public: true,
   },
   SANDBOX: {

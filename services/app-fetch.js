@@ -34,7 +34,7 @@ export function appFetch(url, { method = "GET", body, headers = {} }) {
   };
 
   if (body) reqInit.body = JSON.stringify(body);
+  // if incoming url has https: then just use url instead of root plust url
 
-  // return fetch("https://app.jasonropp.com/api" + url, reqInit);
-  return fetch(env.API_URL + url, reqInit);
+  return url.includes("https") ? fetch(url, reqInit) : fetch(env.API_URL + url, reqInit);
 }

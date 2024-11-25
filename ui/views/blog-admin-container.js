@@ -46,6 +46,7 @@ class BlogAdminContainer extends LitElement {
     }
   }
 
+  // @ts-ignore
   render() {
     if (this.loading) {
       return html`<p>Loading...</p>`;
@@ -168,8 +169,7 @@ class BlogAdminContainer extends LitElement {
       id: this.selectedPost.id,
       title: formData.get("title"),
       content: this.content,
-      tags: formData
-        .get("tags")
+      tags: String(formData.get("tags"))
         .split(",")
         .map((tag) => tag.trim())
         .filter((tag) => tag !== ""),
