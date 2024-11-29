@@ -30,16 +30,18 @@ class PeopleContainer extends ComponentBase {
     }
   }
 
+  /** @returns {Person} */
+  personFromForm(/** @type {HTMLFormElement} */ form) {
+    const formData = new FormData(form);
+    return (/**  @type {*} */ (Object.fromEntries(formData.entries())));
+  }
+
   /** @param {Event & {target: HTMLFormElement}} e */
   async handleCreatePerson(e) {
     e.preventDefault();
-    const formData = new FormData(e.target);
-    // cast as person
-    const newPerson = /** @type {Person} */ (/**  @type {*} */ (Object.fromEntries(formData.entries())));
 
     try {
-      // @ts-ignore
-      await createPerson(newPerson);
+      await createPerson(this.personFromForm(e.target));
       e.target.reset();
       await this.fetchPeople();
     } catch (error) {
@@ -89,14 +91,14 @@ class PeopleContainer extends ComponentBase {
         </form>
         <ul>
           ${this.people
-            .map(
-              (person) => `
+        .map(
+          (person) => `
             <li>
               ${person.firstName} ${person.lastName} - ${person.email} ${person.phone ? `(${person.phone})` : ""}
             </li>
           `
-            )
-            .join("")}
+        )
+        .join("")}
         </ul>
       </div>
     `;

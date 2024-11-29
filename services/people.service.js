@@ -8,7 +8,7 @@ export async function getPeople() {
 }
 
 /**
- * @param {Promise<Person>} body
+ * @param {Person} body
  */
 export async function createPerson(body) {
   return appFetch("/v1/people", {
