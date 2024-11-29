@@ -1,15 +1,16 @@
 import { appFetch } from "./app-fetch.js";
 
-export function getPeople() {
+/** @returns {Promise<Person[]>} */
+export async function getPeople() {
   return appFetch("/v1/people", {
     method: "GET",
   }).then((res) => res.json());
 }
 
 /**
- * @param {Person} body
+ * @param {Promise<Person>} body
  */
-export function createPerson(body) {
+export async function createPerson(body) {
   return appFetch("/v1/people", {
     method: "POST",
     body,
@@ -17,18 +18,18 @@ export function createPerson(body) {
 }
 
 /**
- * @param {number} personId
+ * @param {Person['id']} personId
  */
-export function getConversations(personId) {
+export async function getConversations(personId) {
   return appFetch(`/v1/conversations?id=${personId}`, {
     method: "GET",
   }).then((res) => res.json());
 }
 
 /**
- * @param {Conversation} body
+ * @param {Promise<Conversation>} body
  */
-export function createConversation(body) {
+export async function createConversation(body) {
   return appFetch("/v1/conversations", {
     method: "POST",
     body,
@@ -36,9 +37,9 @@ export function createConversation(body) {
 }
 
 /**
- * @param {Conversation} body
+ * @param {Promise<Conversation>} body
  */
-export function updateConversation(body) {
+export async function updateConversation(body) {
   return appFetch(`/v1/conversations`, {
     method: "PUT",
     body,
@@ -46,9 +47,9 @@ export function updateConversation(body) {
 }
 
 /**
- * @param {number} conversationId
+ * @param {Promise<Conversation['id']>} conversationId
  */
-export function deleteConversation(conversationId) {
+export async function deleteConversation(conversationId) {
   return appFetch(`/v1/conversations?id=${conversationId}`, {
     method: "DELETE",
   }).then((res) => res.json());

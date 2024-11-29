@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { appendParamsObjToPath, decodeQuerystringValues, getRouteByPath } from "./router-util.js";
 import { getSessionUser } from "../services/session.js";
 import routes from "./routes.js";

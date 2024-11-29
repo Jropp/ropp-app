@@ -1,7 +1,6 @@
 //@ts-nocheck
 
 import { LitElement, html, css } from "../../lib/lit.js";
-import { card } from "./card.js";
 
 class SandboxElement extends LitElement {
   static properties = {

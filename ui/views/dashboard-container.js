@@ -1,10 +1,8 @@
 import { LitElement, html, css } from "../../lib/lit.js";
-import { getSessionUser } from "../../services/session.js";
 import { styles } from "../styles.js";
 import "../little-throbber.js";
-import "../../types.js";
 
-class DashboardContainer extends LitElement {
+export default class DashboardContainer extends LitElement {
   static properties = {
     todos: { type: Array },
   };

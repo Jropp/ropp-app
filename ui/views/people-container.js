@@ -4,7 +4,7 @@ import { getPeople, createPerson } from "../../services/people.service.js";
 class PeopleContainer extends ComponentBase {
   /** @type {Person[]} */
   people;
-  __people = { type: Array, value: [] };
+  __people = { type: Array, value: [], urlParam: "people" };
 
   /** @type {Person} */
   person;
@@ -23,13 +23,14 @@ class PeopleContainer extends ComponentBase {
 
   async fetchPeople() {
     try {
-      this.__people = await getPeople();
+      this.people = await getPeople();
       this.render();
     } catch (error) {
       console.error("Error fetching people:", error);
     }
   }
 
+  /** @param {Event & {target: HTMLFormElement}} e */
   async handleCreatePerson(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -49,6 +50,10 @@ class PeopleContainer extends ComponentBase {
   render() {
     this.shadowRoot.innerHTML = `
       <style>
+        form {
+          display: grid;
+          padding: 16px;
+        }
         ul {
           list-style-type: none;
           padding: 0;
@@ -72,7 +77,7 @@ class PeopleContainer extends ComponentBase {
         <form>
           <input type="text" name="firstName" placeholder="First Name" required>
           <input type="text" name="lastName" placeholder="Last Name" required>
-          <input type="email" name="email" placeholder="Email" required>
+          <input type="email" name="email" placeholder="Email">
           <input type="tel" name="phone" placeholder="Phone">
           <input type="number" name="birthDate" placeholder="Birth Date">
           <input type="text" name="address" placeholder="Address">
@@ -83,7 +88,7 @@ class PeopleContainer extends ComponentBase {
           <button type="submit">Add Person</button>
         </form>
         <ul>
-          ${this.__people
+          ${this.people
             .map(
               (person) => `
             <li>

@@ -3,8 +3,10 @@ import { setSessionUser } from "../../services/session.js";
 import { loginUser, signupUser } from "../../services/user.service.js";
 import { styles } from "../styles.js";
 import "../little-throbber.js";
+import { go } from "../../router/app-router.js";
+import clientRoutes from "../../router/routes.js";
 
-class LoginContainer extends LitElement {
+export default class LoginContainer extends LitElement {
   static get properties() {
     return {
       showSignup: { type: Boolean },
@@ -54,8 +56,7 @@ class LoginContainer extends LitElement {
         throw new Error("Login failed");
       }
       setSessionUser(user);
-      // Update this line to use hash-based navigation
-      window.location.hash = "#dashboard";
+      go(clientRoutes.DASHBOARD.path);
     } catch (error) {
       console.error(error);
     }

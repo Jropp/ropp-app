@@ -52,6 +52,7 @@ const clientRoutes = processRoutes({
     showHeader: true,
   },
   DASHBOARD: {},
+  PEOPLE: {},
   WORKOUTS: {
     public: true,
   },
